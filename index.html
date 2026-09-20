@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>People Journal</title>
+
+<meta name="theme-color" content="#222222" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="People Journal" />
+<link rel="manifest" href="./manifest.webmanifest" />
+<link rel="apple-touch-icon" href="./icon-192.png" />
+
+<style>
+:root{
+  --ink:#171717;--muted:#747474;--line:#ddddda;--soft:#f6f5f2;
+  --paper:#fff;--bg:#efefed;--dark:#222;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);font-family:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,-apple-system,sans-serif}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.shell{max-width:1080px;margin:0 auto;padding:28px}
+.app{background:var(--paper);min-height:820px;border-radius:18px;box-shadow:0 12px 40px rgba(0,0,0,.06);overflow:hidden}
+.nav{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px}
+.brand{font-family:Georgia,"Times New Roman","Batang",serif;font-size:19px}
+.navlinks{display:flex;gap:8px;flex-wrap:wrap}
+.nav button{border:0;background:transparent;padding:8px 12px;border-radius:999px;color:#666}
+.nav button.active{background:var(--dark);color:#fff}
+.view{display:none;padding:44px 48px 54px}.view.active{display:block}
+.eyebrow{font-size:11px;letter-spacing:.12em;color:#888;margin-bottom:9px}
+h1{font-family:Georgia,"Times New Roman","Batang",serif;font-size:40px;line-height:1.15;letter-spacing:-.03em;margin:0 0 10px}
+h2{font-family:Georgia,"Times New Roman","Batang",serif;font-size:21px;margin:0}
+h3{margin:0;font-size:15px}
+.lead{color:#5f5f5f;line-height:1.75;font-size:14px;max-width:760px}
+.primary,.secondary{border-radius:999px;padding:10px 15px}
+.primary{border:0;background:var(--dark);color:#fff}
+.secondary{border:1px solid #cfcfcb;background:#fff;color:#222}
+.hero{display:grid;grid-template-columns:1.4fr .6fr;gap:28px;align-items:end;padding-bottom:30px;border-bottom:1px solid var(--line)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px}
+.stat{background:var(--soft);border-radius:14px;padding:16px}
+.stat .num{font-family:Georgia,"Times New Roman",serif;font-size:28px;margin-bottom:4px}
+.stat .label{font-size:12px;color:#777}
+.section{margin-top:30px}
+.mission{display:grid;grid-template-columns:auto 1fr;gap:13px;align-items:start;border:1px solid var(--line);border-radius:14px;padding:18px 20px;background:#fcfcfa}
+.mission-icon{width:34px;height:34px;border:1px solid #bbb;border-radius:50%;display:grid;place-items:center;font-size:15px}
+.mission-title{font-weight:700;font-size:14px;margin-bottom:5px}
+.mission p{margin:0;color:#666;font-size:13px;line-height:1.7}
+.people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.person-card{border:1px solid var(--line);border-radius:14px;padding:15px;background:#fff;cursor:pointer}
+.person-card:hover{background:#fbfbf9}
+.person-top{display:flex;justify-content:space-between;gap:12px;align-items:start}
+.person-name{font-weight:700;font-size:15px}
+.person-rel{font-size:11px;color:#888;margin-top:3px}
+.person-count{font-size:11px;color:#888}
+.person-note{font-size:12px;color:#666;line-height:1.55;margin-top:12px;min-height:36px}
+.person-meta{display:flex;justify-content:space-between;gap:8px;margin-top:12px;font-size:11px;color:#999}
+.empty{border:1px dashed #cfcfcb;border-radius:12px;padding:18px;color:#888;font-size:13px}
+.formbox{border:1px solid var(--line);border-radius:14px;padding:18px 20px;background:#fcfcfa}
+.formrow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+input[type=text],input[type=date],select,textarea{
+  width:100%;border:1px solid #dededb;border-radius:12px;background:#fff;padding:11px 12px;outline:none
+}
+textarea{min-height:84px;resize:vertical;line-height:1.6}
+input:focus,textarea:focus,select:focus{border-color:#999}
+.label{font-size:11px;color:#777;margin-bottom:6px}
+.field{margin-top:12px}
+.profile-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.profile-title{font-size:30px;font-family:Georgia,"Times New Roman","Batang",serif}
+.profile-sub{color:#777;font-size:13px;margin-top:4px}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}
+.info-card{background:var(--soft);border-radius:14px;padding:15px}
+.info-card .small{font-size:11px;color:#777;margin-bottom:6px}
+.info-card textarea{background:#fff}
+.timeline{display:grid;gap:10px;margin-top:14px}
+.log-card{border-left:2px solid #222;background:#fafaf8;padding:12px 14px}
+.log-date{font-size:11px;color:#888;margin-bottom:5px}
+.log-main{font-size:13px;line-height:1.6}
+.log-sub{font-size:12px;color:#777;margin-top:5px}
+.question{margin-top:24px;padding-bottom:22px;border-bottom:1px solid #ecece9}
+.qhead{display:flex;gap:12px;align-items:baseline;margin-bottom:6px}
+.qno{width:24px;height:24px;border:1px solid #bbb;border-radius:50%;display:grid;place-items:center;font-size:10px;color:#777;flex:0 0 24px}
+.hint{font-size:12px;color:#888;line-height:1.55;margin:0 0 10px 36px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.chips label{border:1px solid #c9c9c5;border-radius:999px;padding:7px 11px;font-size:12px;cursor:pointer}
+.chips input{display:none}
+.chips label:has(input:checked){background:#222;color:#fff;border-color:#222}
+.footer-actions{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:24px}
+.status{font-size:12px;color:#888}
+.backup-box{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;border:1px solid var(--line);border-radius:14px;padding:18px 20px;background:#fcfcfa}
+.backup-copy p{margin:5px 0 0;color:#666;font-size:12px;line-height:1.7}
+.backup-actions{display:flex;gap:8px;flex-wrap:wrap;align-content:start;justify-content:flex-end}
+.backup-actions input[type=file]{display:none}
+@media(max-width:800px){
+  .shell{padding:0}.app{border-radius:0;box-shadow:none;min-height:100vh}.view{padding:30px 20px 42px}.nav{padding:0 16px}
+  .hero,.backup-box,.profile-grid,.formrow,.two{grid-template-columns:1fr}
+  .people-grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.backup-actions{justify-content:flex-start}
+  h1{font-size:32px}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+<div class="app">
+  <nav class="nav">
+    <div class="brand">People Journal</div>
+    <div class="navlinks">
+      <button id="homeTab" class="active">홈</button>
+      <button id="peopleTab">사람들</button>
+      <button id="todayTab">오늘 기록</button>
+    </div>
+  </nav>
+
+  <section id="homeView" class="view active">
+    <div class="hero">
+      <div>
+        <div class="eyebrow">MY CIRCLE</div>
+        <h1>매일 만나는 사람을 조금씩 더 알아가기</h1>
+        <p class="lead">
+          매일 새로운 사람을 고르는 대신, 자주 보는 몇 사람의 기록을 계속 쌓습니다.
+          시간이 지나면 각 사람의 <b>관심사, 최근 변화, 내가 세운 가설, 다음 대화거리</b>가 자연스럽게 누적됩니다.
+        </p>
+      </div>
+      <div><button class="primary" id="quickLogBtn">오늘 기록하기 →</button></div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="num" id="peopleCount">0</div><div class="label">등록한 사람</div></div>
+      <div class="stat"><div class="num" id="logCount">0</div><div class="label">총 관찰 기록</div></div>
+      <div class="stat"><div class="num" id="weekCount">0</div><div class="label">최근 7일 기록</div></div>
+      <div class="stat"><div class="num" id="streakCount">0</div><div class="label">연속 기록</div></div>
+    </div>
+
+    <div class="section">
+      <div class="eyebrow">TODAY'S MINI QUEST</div>
+      <div class="mission">
+        <div class="mission-icon">◎</div>
+        <div>
+          <div class="mission-title" id="missionTitle"></div>
+          <p id="missionText"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="eyebrow">YOUR PEOPLE</div>
+      <h2>자주 보는 사람</h2>
+      <div id="homePeople" class="people-grid"></div>
+    </div>
+  </section>
+
+  <section id="peopleView" class="view">
+    <div class="hero">
+      <div>
+        <div class="eyebrow">PEOPLE</div>
+        <h1>내가 자주 보는 사람들</h1>
+        <p class="lead">사람별로 기록이 누적됩니다. 같은 사람을 여러 날 기록할수록 그 사람에 대한 이해가 깊어집니다.</p>
+      </div>
+    </div>
+
+    <div class="section formbox">
+      <h2>사람 추가하기</h2>
+      <div class="formrow">
+        <div class="field"><div class="label">이름</div><input id="newPersonName" type="text" placeholder="예: 민수"></div>
+        <div class="field"><div class="label">관계</div><input id="newPersonRel" type="text" placeholder="예: 직장 동료"></div>
+      </div>
+      <div class="field"><div class="label">한 줄 메모</div><input id="newPersonNote" type="text" placeholder="예: 점심을 자주 같이 먹는 동료"></div>
+      <div style="margin-top:14px"><button class="primary" id="addPersonBtn">추가</button></div>
+    </div>
+
+    <div class="section">
+      <div id="peopleList" class="people-grid"></div>
+    </div>
+
+    <div class="section">
+      <div class="eyebrow">DATA BACKUP</div>
+      <div class="backup-box">
+        <div class="backup-copy">
+          <h2>기록 백업</h2>
+          <p>사람 프로필과 모든 일일 기록을 함께 백업합니다.</p>
+        </div>
+        <div class="backup-actions">
+          <button class="secondary" id="exportBtn">백업 파일 받기</button>
+          <label class="secondary" for="importInput" style="display:inline-flex;align-items:center;cursor:pointer">백업 불러오기</label>
+          <input id="importInput" type="file" accept=".json,application/json">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="todayView" class="view">
+    <div class="hero">
+      <div>
+        <div class="eyebrow">DAILY CHECK-IN</div>
+        <h1>오늘 누구를 조금 더 알게 됐나요?</h1>
+        <p class="lead">자주 보는 사람 중 한 명을 고르고 5~7분 정도만 기록합니다.</p>
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="qhead"><span class="qno">1</span><h3>누구였나요?</h3></div>
+      <p class="hint">등록한 사람 중에서 선택하세요.</p>
+      <div class="two">
+        <select id="logPerson"></select>
+        <input id="logDate" type="date">
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="qhead"><span class="qno">2</span><h3>오늘 새롭게 본 것</h3></div>
+      <p class="hint">평소와 달랐던 말, 반응, 취향, 행동 하나면 충분합니다.</p>
+      <textarea id="logNoticed" placeholder="예: 회의에서는 조용했는데 1:1에서는 이야기를 꽤 길게 했다."></textarea>
+    </div>
+
+    <div class="question">
+      <div class="qhead"><span class="qno">3</span><h3>내가 한 추론</h3></div>
+      <p class="hint">맞힐 필요 없습니다. 하나의 가설로 적어두세요.</p>
+      <textarea id="logGuess" placeholder="예: 큰 자리보다는 소수 대화에서 더 편한 사람일 수 있겠다."></textarea>
+      <div style="margin-top:10px"><input id="logAlt" type="text" placeholder="다른 설명도 가능하다면?"></div>
+    </div>
+
+    <div class="question">
+      <div class="qhead"><span class="qno">4</span><h3>다음에 기억할 것</h3></div>
+      <p class="hint">관심사, 최근 고민, 다음 대화거리 중 하나.</p>
+      <textarea id="logRemember" placeholder="예: 다음주 제주도 여행 간다고 했음."></textarea>
+    </div>
+
+    <div class="question">
+      <div class="qhead"><span class="qno">5</span><h3>다음에 해볼 작은 행동</h3></div>
+      <textarea id="logNext" placeholder="예: 여행 다녀온 뒤 어땠는지 먼저 물어보기."></textarea>
+    </div>
+
+    <div class="footer-actions">
+      <span class="status" id="todayStatus"></span>
+      <button class="primary" id="saveLogBtn">오늘 기록 저장</button>
+    </div>
+  </section>
+
+  <section id="profileView" class="view">
+    <div class="profile-head">
+      <div>
+        <div class="eyebrow">PERSON PROFILE</div>
+        <div class="profile-title" id="profileName"></div>
+        <div class="profile-sub" id="profileRel"></div>
+      </div>
+      <button class="secondary" id="profileBackBtn">← 사람들</button>
+    </div>
+
+    <div class="profile-grid">
+      <div class="info-card">
+        <div class="small">이 사람이 중요하게 여기는 것</div>
+        <textarea id="profileValues" placeholder="예: 일정 준수, 가족 시간, 성장..."></textarea>
+      </div>
+      <div class="info-card">
+        <div class="small">관심사 / 좋아하는 것</div>
+        <textarea id="profileLikes" placeholder="예: 러닝, 여행, 특정 프로젝트..."></textarea>
+      </div>
+      <div class="info-card">
+        <div class="small">요즘 중요한 일</div>
+        <textarea id="profileCurrent" placeholder="예: 승진 준비, 프로젝트 마감..."></textarea>
+      </div>
+      <div class="info-card">
+        <div class="small">이 사람과 가까워지는 힌트</div>
+        <textarea id="profileConnect" placeholder="예: 1:1 대화에서 편해함, 먼저 물어봐주면 좋아함..."></textarea>
+      </div>
+    </div>
+
+    <div class="footer-actions">
+      <span class="status" id="profileStatus">자동 저장</span>
+      <button class="secondary" id="deletePersonBtn">이 사람 삭제</button>
+    </div>
+
+    <div class="section">
+      <div class="eyebrow">TIMELINE</div>
+      <h2>이 사람에 대한 기록</h2>
+      <div id="profileTimeline" class="timeline"></div>
+    </div>
+  </section>
+</div>
+</div>
+
+<script>
+(() => {
+  const KEY = 'people-journal-fixed-circle-v1';
+  let state = { people: [], logs: [] };
+  let activePersonId = null;
+
+  const quests = [
+    ["평소와 다른 점 하나 찾기","자주 보는 사람일수록 ‘늘 그런 사람’이라고 보기 쉽습니다. 오늘은 평소와 다른 점 하나만 찾아보세요."],
+    ["전에 한 말 다시 꺼내기","상대가 전에 말했던 작은 내용을 하나 기억해 자연스럽게 다시 물어보세요."],
+    ["말이 길어지는 주제 찾기","어떤 주제에서 상대의 말이 길어지는지 눈여겨보세요."],
+    ["후속 질문 한 번 더","상대가 말한 뒤 바로 내 얘기로 넘어가지 말고 질문을 하나 더 해보세요."],
+    ["의외의 취향 찾기","익숙한 사람에게도 아직 모르는 취향이 하나쯤 있습니다. 작은 취향 하나를 발견해보세요."],
+    ["반대 설명 떠올리기","상대 행동을 보고 이유를 하나 떠올렸다면, 다른 가능성도 하나 생각해보세요."]
+  ];
+
+  function saveState(){
+    localStorage.setItem(KEY, JSON.stringify(state));
+    refreshAll();
+  }
+  function loadState(){
+    const raw = localStorage.getItem(KEY);
+    if(raw){
+      try{ state = JSON.parse(raw); }catch(e){}
+    }
+    state.people = Array.isArray(state.people) ? state.people : [];
+    state.logs = Array.isArray(state.logs) ? state.logs : [];
+  }
+  function id(){
+    return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+  }
+  function fmt(d){
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+  function esc(s){
+    return String(s ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  }
+  function show(view){
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+    document.getElementById(view+'View').classList.add('active');
+    if(view==='home') document.getElementById('homeTab').classList.add('active');
+    if(view==='people') document.getElementById('peopleTab').classList.add('active');
+    if(view==='today') document.getElementById('todayTab').classList.add('active');
+    if(view==='profile') renderProfile();
+    refreshAll();
+  }
+
+  function personLogs(pid){
+    return state.logs.filter(l=>l.personId===pid).sort((a,b)=>b.date.localeCompare(a.date));
+  }
+  function lastLog(pid){
+    return personLogs(pid)[0];
+  }
+  function personCard(p){
+    const logs=personLogs(p.id), last=logs[0];
+    const note = last?.remember || last?.noticed || p.note || '아직 기록이 없습니다.';
+    return `<div class="person-card" data-person="${p.id}">
+      <div class="person-top">
+        <div><div class="person-name">${esc(p.name)}</div><div class="person-rel">${esc(p.relationship||'')}</div></div>
+        <div class="person-count">${logs.length}회 기록</div>
+      </div>
+      <div class="person-note">${esc(note)}</div>
+      <div class="person-meta"><span>${last ? '최근 '+last.date : '첫 기록 전'}</span><span>→</span></div>
+    </div>`;
+  }
+
+  function renderPeople(){
+    const grids=[document.getElementById('homePeople'),document.getElementById('peopleList')];
+    grids.forEach(g=>{
+      if(!g) return;
+      g.innerHTML = state.people.length ? state.people.map(personCard).join('') : '<div class="empty">아직 등록된 사람이 없습니다. ‘사람들’ 탭에서 자주 보는 사람을 먼저 추가해보세요.</div>';
+      g.querySelectorAll('[data-person]').forEach(el=>{
+        el.onclick=()=>openProfile(el.dataset.person);
+      });
+    });
+  }
+
+  function renderStats(){
+    document.getElementById('peopleCount').textContent=state.people.length;
+    document.getElementById('logCount').textContent=state.logs.length;
+    const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-6); cutoff.setHours(0,0,0,0);
+    document.getElementById('weekCount').textContent=
+      state.logs.filter(l=>new Date(l.date+'T00:00:00')>=cutoff).length;
+
+    const days=new Set(state.logs.map(l=>l.date));
+    let d=new Date(), streak=0;
+    for(let i=0;i<365;i++){
+      const s=fmt(d);
+      if(days.has(s)){streak++;d.setDate(d.getDate()-1);}
+      else{
+        if(i===0){d.setDate(d.getDate()-1);continue;}
+        break;
+      }
+    }
+    document.getElementById('streakCount').textContent=streak;
+  }
+
+  function renderQuest(){
+    const idx=Math.abs(Math.floor(Date.now()/86400000))%quests.length;
+    document.getElementById('missionTitle').textContent=quests[idx][0];
+    document.getElementById('missionText').textContent=quests[idx][1];
+  }
+
+  function refreshSelect(){
+    const s=document.getElementById('logPerson');
+    const prev=s.value;
+    s.innerHTML = '<option value="">사람 선택</option>' +
+      state.people.map(p=>`<option value="${p.id}">${esc(p.name)}${p.relationship?' · '+esc(p.relationship):''}</option>`).join('');
+    if(state.people.some(p=>p.id===prev)) s.value=prev;
+  }
+
+  function refreshAll(){
+    renderPeople();renderStats();renderQuest();refreshSelect();
+  }
+
+  function openProfile(pid){
+    activePersonId=pid;
+    show('profile');
+  }
+
+  function renderProfile(){
+    const p=state.people.find(x=>x.id===activePersonId);
+    if(!p){show('people');return;}
+    document.getElementById('profileName').textContent=p.name;
+    document.getElementById('profileRel').textContent=p.relationship || '';
+    document.getElementById('profileValues').value=p.values || '';
+    document.getElementById('profileLikes').value=p.likes || '';
+    document.getElementById('profileCurrent').value=p.current || '';
+    document.getElementById('profileConnect').value=p.connect || '';
+
+    const logs=personLogs(p.id);
+    document.getElementById('profileTimeline').innerHTML = logs.length ? logs.map(l=>`
+      <div class="log-card">
+        <div class="log-date">${esc(l.date)}</div>
+        <div class="log-main">${esc(l.noticed || '')}</div>
+        ${l.guess ? `<div class="log-sub">내 추론 · ${esc(l.guess)}</div>`:''}
+        ${l.remember ? `<div class="log-sub">기억할 것 · ${esc(l.remember)}</div>`:''}
+        ${l.next ? `<div class="log-sub">다음 행동 · ${esc(l.next)}</div>`:''}
+      </div>`).join('') : '<div class="empty">아직 이 사람에 대한 일일 기록이 없습니다.</div>';
+  }
+
+  function updateProfileField(field,value){
+    const p=state.people.find(x=>x.id===activePersonId);
+    if(!p) return;
+    p[field]=value;
+    localStorage.setItem(KEY, JSON.stringify(state));
+    const s=document.getElementById('profileStatus');
+    s.textContent='저장됨';
+    clearTimeout(window.__ps);
+    window.__ps=setTimeout(()=>s.textContent='자동 저장',800);
+  }
+
+  document.getElementById('homeTab').onclick=()=>show('home');
+  document.getElementById('peopleTab').onclick=()=>show('people');
+  document.getElementById('todayTab').onclick=()=>show('today');
+  document.getElementById('quickLogBtn').onclick=()=>show('today');
+  document.getElementById('profileBackBtn').onclick=()=>show('people');
+
+  document.getElementById('addPersonBtn').onclick=()=>{
+    const name=document.getElementById('newPersonName').value.trim();
+    if(!name){alert('이름을 입력해주세요.');return;}
+    state.people.push({
+      id:id(),
+      name,
+      relationship:document.getElementById('newPersonRel').value.trim(),
+      note:document.getElementById('newPersonNote').value.trim(),
+      values:'',likes:'',current:'',connect:''
+    });
+    document.getElementById('newPersonName').value='';
+    document.getElementById('newPersonRel').value='';
+    document.getElementById('newPersonNote').value='';
+    saveState();
+  };
+
+  ['Values','Likes','Current','Connect'].forEach(x=>{
+    document.getElementById('profile'+x).addEventListener('input',e=>{
+      updateProfileField(x.toLowerCase(),e.target.value);
+    });
+  });
+
+  document.getElementById('deletePersonBtn').onclick=()=>{
+    const p=state.people.find(x=>x.id===activePersonId);
+    if(!p) return;
+    if(confirm(`${p.name}의 프로필과 관련 기록을 모두 삭제할까요?`)){
+      state.people=state.people.filter(x=>x.id!==activePersonId);
+      state.logs=state.logs.filter(l=>l.personId!==activePersonId);
+      activePersonId=null;
+      saveState();
+      show('people');
+    }
+  };
+
+  document.getElementById('saveLogBtn').onclick=()=>{
+    const pid=document.getElementById('logPerson').value;
+    if(!pid){alert('먼저 사람을 선택해주세요.');return;}
+    const date=document.getElementById('logDate').value || fmt(new Date());
+    const noticed=document.getElementById('logNoticed').value.trim();
+    const guess=document.getElementById('logGuess').value.trim();
+    const alt=document.getElementById('logAlt').value.trim();
+    const remember=document.getElementById('logRemember').value.trim();
+    const next=document.getElementById('logNext').value.trim();
+    if(!noticed && !guess && !remember && !next){
+      alert('한 칸 이상 기록해주세요.');
+      return;
+    }
+    state.logs.push({
+      id:'l_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+      personId:pid,date,noticed,guess,alt,remember,next
+    });
+    saveState();
+    ['logNoticed','logGuess','logAlt','logRemember','logNext'].forEach(id=>document.getElementById(id).value='');
+    const s=document.getElementById('todayStatus');
+    s.textContent='저장되었습니다.';
+    clearTimeout(window.__ts);
+    window.__ts=setTimeout(()=>s.textContent='',1200);
+  };
+
+  function download(filename,content){
+    const blob=new Blob([content],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),500);
+  }
+
+  document.getElementById('exportBtn').onclick=()=>{
+    download(`people_journal_backup_${fmt(new Date()).replaceAll('-','')}.json`,
+      JSON.stringify({app:'People Journal',version:1,exportedAt:new Date().toISOString(),state},null,2));
+  };
+
+  document.getElementById('importInput').addEventListener('change',async e=>{
+    const file=e.target.files?.[0]; if(!file) return;
+    try{
+      const data=JSON.parse(await file.text());
+      if(!data?.state?.people || !data?.state?.logs) throw new Error();
+      if(confirm('현재 데이터를 백업 파일 내용으로 교체할까요?')){
+        state=data.state;saveState();show('home');
+      }
+    }catch(err){alert('올바른 백업 파일이 아닙니다.');}
+    e.target.value='';
+  });
+
+  document.getElementById('logDate').value=fmt(new Date());
+  loadState();
+  refreshAll();
+})();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+
+</body>
+</html>

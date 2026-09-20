@@ -1,0 +1,22 @@
+{
+  "name": "People Journal",
+  "short_name": "People Journal",
+  "description": "자주 보는 사람을 조금씩 더 알아가기 위한 개인 관찰·관계 저널",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#efefed",
+  "theme_color": "#222222",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
