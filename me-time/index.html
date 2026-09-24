@@ -242,6 +242,7 @@ textarea.answer{width:100%;min-height:380px;resize:vertical;border:none;backgrou
       <input id="authEmail" type="email" autocomplete="email" inputmode="email" placeholder="name@example.com" required />
       <label for="authPassword">비밀번호</label>
       <input id="authPassword" type="password" autocomplete="current-password" minlength="8" placeholder="8자 이상" required />
+      <label style="display:flex;align-items:center;gap:8px;margin-top:4px"><input id="showAuthPassword" type="checkbox" style="width:auto"> 비밀번호 보기</label>
       <button class="auth-submit" id="authSubmit" type="submit">로그인</button>
       <button class="auth-secondary" id="sendLinkBtn" type="button">처음 설정 / 비밀번호를 잊었을 때</button>
     </form>
@@ -295,9 +296,9 @@ textarea.answer{width:100%;min-height:380px;resize:vertical;border:none;backgrou
 
       <div class="stats">
         <div class="stat clickable" id="recordedDaysStat" role="button" tabindex="0" aria-label="기록한 날 달력 보기"><div class="stat-label">기록한 날</div><span class="stat-value" id="statDays">0</span><span class="stat-unit">일</span><span class="stat-hint">눌러서 달력 보기 →</span></div>
-        <div class="stat"><div class="stat-label">연속 기록</div><span class="stat-value" id="statStreak">0</span><span class="stat-unit">일</span></div>
-        <div class="stat"><div class="stat-label">발견한 시간</div><span class="stat-value" id="statMinutes">0</span><span class="stat-unit">분</span></div>
-        <div class="stat"><div class="stat-label">자주 느낀 감정</div><span class="stat-value" id="statEmotion" style="font-size:22px">—</span></div>
+        <div class="stat clickable" data-open-calendar role="button" tabindex="0"><div class="stat-label">연속 기록</div><span class="stat-value" id="statStreak">0</span><span class="stat-unit">일</span><span class="stat-hint">기록 달력 보기 →</span></div>
+        <div class="stat clickable" data-open-calendar role="button" tabindex="0"><div class="stat-label">발견한 시간</div><span class="stat-value" id="statMinutes">0</span><span class="stat-unit">분</span><span class="stat-hint">기록 달력 보기 →</span></div>
+        <div class="stat clickable" data-open-calendar role="button" tabindex="0"><div class="stat-label">자주 느낀 감정</div><span class="stat-value" id="statEmotion" style="font-size:22px">—</span><span class="stat-hint">기록 달력 보기 →</span></div>
       </div>
 
       <section class="home-section">
@@ -1206,8 +1207,11 @@ $('authForm').addEventListener('submit',async e=>{
     return;
   }
   $('authPassword').value='';
+  localStorage.setItem('journal:lastEmail',email);
   $('authStatus').textContent='로그인되었습니다.';
 });
+$('authEmail').value=localStorage.getItem('journal:lastEmail')||'';
+$('showAuthPassword').onchange=e=>$('authPassword').type=e.target.checked?'text':'password';
 $('sendLinkBtn').onclick=async()=>{
   const email=$('authEmail').value.trim();
   if(!email){$('authStatus').textContent='먼저 이메일을 입력해주세요.';return;}
@@ -1275,6 +1279,7 @@ $('recentList').addEventListener('click',e=>{
 
 $('recordedDaysStat').onclick=openCalendar;
 $('recordedDaysStat').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openCalendar();}};
+document.querySelectorAll('[data-open-calendar]').forEach(el=>{el.onclick=openCalendar;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openCalendar();}}});
 $('calClose').onclick=closeCalendar;
 $('calPrev').onclick=()=>{calendarMonth=new Date(calendarMonth.getFullYear(),calendarMonth.getMonth()-1,1);selectedCalendarDate=null;renderCalendar();};
 $('calNext').onclick=()=>{calendarMonth=new Date(calendarMonth.getFullYear(),calendarMonth.getMonth()+1,1);selectedCalendarDate=null;renderCalendar();};

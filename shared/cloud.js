@@ -29,17 +29,19 @@
       <p>같은 계정으로 세 가지 일지를 모두 사용할 수 있습니다. 처음 한 번만 이메일 링크로 들어온 뒤 비밀번호를 설정하면 됩니다.</p>
       <label>이메일</label><input type="email" data-cloud-email autocomplete="email" placeholder="이메일 주소">
       <label>비밀번호</label><input type="password" data-cloud-password autocomplete="current-password" placeholder="비밀번호">
+      <label style="display:flex;align-items:center;gap:8px;margin-top:8px"><input type="checkbox" data-cloud-show style="width:auto"> 비밀번호 보기</label>
       <div class="cloud-actions"><button class="cloud-btn" data-cloud-login>로그인</button><button class="cloud-btn alt" data-cloud-link>처음 로그인 · 이메일 링크 받기</button></div>
       <div class="cloud-message" data-cloud-message></div>
     </div>`;
     document.body.appendChild(gate);
-    const email=gate.querySelector('[data-cloud-email]'), password=gate.querySelector('[data-cloud-password]'), message=gate.querySelector('[data-cloud-message]');
+    const email=gate.querySelector('[data-cloud-email]'), password=gate.querySelector('[data-cloud-password]'), message=gate.querySelector('[data-cloud-message]'), show=gate.querySelector('[data-cloud-show]');
+    email.value=localStorage.getItem('journal:lastEmail')||'';
     const setMessage=(text,bad=false)=>{message.textContent=text;message.style.color=bad?'#a33':'#666'};
     gate.querySelector('[data-cloud-login]').onclick=async()=>{
       if(!email.value.trim()||!password.value){setMessage('이메일과 비밀번호를 입력해주세요.',true);return;}
       setMessage('로그인하는 중…');
       const {error}=await client.auth.signInWithPassword({email:email.value.trim(),password:password.value});
-      if(error)setMessage(error.message==='Invalid login credentials'?'이메일 또는 비밀번호를 확인해주세요.':error.message,true);
+      if(error)setMessage(error.message==='Invalid login credentials'?'이메일 또는 비밀번호를 확인해주세요.':error.message,true);else localStorage.setItem('journal:lastEmail',email.value.trim());
     };
     gate.querySelector('[data-cloud-link]').onclick=async()=>{
       if(!email.value.trim()){setMessage('이메일을 먼저 입력해주세요.',true);return;}
@@ -49,6 +51,7 @@
       setMessage(error?(rateLimited?'이메일 발송 한도를 넘었습니다. 마지막으로 받은 링크를 사용하거나 약 1시간 뒤 다시 시도해주세요.':error.message):'이메일로 로그인 링크를 보냈습니다.',!!error);
     };
     password.addEventListener('keydown',e=>{if(e.key==='Enter')gate.querySelector('[data-cloud-login]').click()});
+    show.addEventListener('change',()=>password.type=show.checked?'text':'password');
     let activeId='';
     const handle=async(session)=>{
       if(session?.user){
