@@ -121,7 +121,9 @@ textarea.answer{width:100%;min-height:380px;resize:vertical;border:none;backgrou
 .home-section h2{font-family:Georgia,"Batang",serif;font-size:23px;margin:0}
 .home-section p{margin:4px 0 0;color:#858078;font-size:13px}
 .part-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:9px}
-.part-card{border:1px solid #e1ddd5;border-radius:13px;padding:16px 12px;background:#fff;min-height:166px;display:flex;flex-direction:column}
+.part-card{border:1px solid #e1ddd5;border-radius:13px;padding:16px 12px;background:#fff;min-height:166px;display:flex;flex-direction:column;text-align:left;color:inherit;cursor:pointer;transition:.18s ease}
+.part-card:hover{transform:translateY(-2px);border-color:#aaa49a;background:#fdfbf7;box-shadow:0 8px 20px rgba(40,36,30,.06)}
+.part-card:focus-visible{outline:2px solid #59625a;outline-offset:2px}
 .part-no{font-family:Georgia,"Times New Roman",serif;font-size:12px;color:#9a958d}
 .part-name{font-family:Georgia,"Batang",serif;font-weight:700;font-size:16px;margin-top:12px}
 .part-stats{margin-top:auto;padding-top:18px}
@@ -174,6 +176,7 @@ textarea.answer{width:100%;min-height:380px;resize:vertical;border:none;backgrou
 .detail-question{font-family:Georgia,"Batang",serif;font-size:15px;font-weight:700;line-height:1.55;margin:14px 0 8px}
 .detail-snippet{font-size:13px;line-height:1.7;color:#615d57;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .detail-actions{display:flex;gap:8px;margin-top:16px}
+.part-record-list{display:grid;gap:10px}.part-record{border:1px solid #e1ddd5;border-radius:13px;padding:15px;background:#fff}.part-record-top{display:flex;justify-content:space-between;gap:12px;align-items:center}.part-record-date{font-family:Georgia,"Times New Roman",serif;font-size:13px;color:#6f6a63}.part-record-question{font-family:Georgia,"Batang",serif;font-size:15px;font-weight:700;line-height:1.55;margin:10px 0 7px}.part-record-answer{font-size:13px;line-height:1.7;color:#615d57;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}.part-record-meta{font-size:11px;color:#8c877f;margin-top:8px}
 .danger-btn{color:#8b3b35;border-color:#d7b7b2}
 @media(max-width:560px){.calendar-modal{border-radius:18px}.calendar-head{padding:18px 16px 14px}.calendar-body{padding:14px 16px 20px}.cal-day{border-radius:10px}.cal-day .day-num{width:30px;height:30px}.detail-top{display:block}.detail-actions{display:grid;grid-template-columns:1fr 1fr}.recent-actions{justify-content:flex-start}.recent-item{grid-template-columns:1fr}.recent-snippet{white-space:normal}}
 
@@ -487,6 +490,16 @@ textarea.answer{width:100%;min-height:380px;resize:vertical;border:none;backgrou
       <div class="calendar-legend"><span><span class="legend-circle"></span>기록한 날</span><span>날짜를 누르면 기록을 확인할 수 있어요.</span></div>
       <div class="record-detail empty" id="recordDetail">동그라미 표시된 날짜를 선택해보세요.</div>
     </div>
+  </section>
+</div>
+
+<div class="modal-backdrop hidden" id="partBackdrop" role="dialog" aria-modal="true" aria-labelledby="partListTitle">
+  <section class="calendar-modal">
+    <header class="calendar-head">
+      <div class="calendar-title-wrap"><div class="calendar-title" id="partListTitle">영역 기록</div><div class="calendar-count" id="partListCount"></div></div>
+      <button class="icon-btn" id="partListClose" aria-label="닫기">×</button>
+    </header>
+    <div class="calendar-body"><div class="part-record-list" id="partRecordList"></div></div>
   </section>
 </div>
 
@@ -1116,7 +1129,7 @@ function renderHome(){
   });
   $('homePartGrid').innerHTML=JOURNAL.map((p,i)=>{
     const st=partStats[i];
-    return `<div class="part-card">
+    return `<button type="button" class="part-card" data-part-index="${i}" aria-label="${escapeHTML(p.name)} 영역 기록 모아보기">
       <div class="part-no">${String(i+1).padStart(2,'0')}</div>
       <div class="part-name">${escapeHTML(p.name)}</div>
       <div class="part-stats">
@@ -1125,7 +1138,7 @@ function renderHome(){
         <div class="part-progress"><span style="width:${st.rate}%"></span></div>
         <div class="part-rate">질문 진행률 ${st.rate}%</div>
       </div>
-    </div>`;
+    </button>`;
   }).join('');
   $('statDays').textContent=entries.length;
   $('statStreak').textContent=streakCount(entries);
@@ -1158,6 +1171,21 @@ function renderHome(){
     $('recentList').innerHTML='<div class="empty-state">아직 기록이 없습니다. 오늘의 질문으로 첫 페이지를 만들어보세요.</div>';
   }
 }
+
+function openPartRecords(partIndex){
+  const part=JOURNAL[partIndex];
+  const entries=allSavedEntries().filter(x=>promptFor(dateFromIso(x.date)).partIndex===partIndex);
+  $('partListTitle').textContent=`${part.name} · 기록 모아보기`;
+  $('partListCount').textContent=`${entries.length}개 기록 · ${part.prompts.length}개 질문`;
+  $('partRecordList').innerHTML=entries.length?entries.map(x=>{
+    const d=dateFromIso(x.date),pr=promptFor(d),question=(x.data.question||pr.prompt||'').trim();
+    const answer=(x.data.answer||x.data.discovery||x.data.nextQuestion||'').trim()||'부가 기록만 작성된 날입니다.';
+    const emotions=Array.isArray(x.data.emotions)&&x.data.emotions.length?` · ${x.data.emotions.map(escapeHTML).join(', ')}`:'';
+    return `<article class="part-record"><div class="part-record-top"><span class="part-record-date">${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}</span><div class="recent-actions"><button class="mini-btn" data-part-edit="${x.date}">수정</button><button class="mini-btn danger" data-part-delete="${x.date}">삭제</button></div></div><div class="part-record-question">${escapeHTML(question)}</div><div class="part-record-answer">${escapeHTML(answer)}</div><div class="part-record-meta">${Math.max(1,Math.round((Number(x.data.seconds)||0)/60))}분${emotions}</div></article>`;
+  }).join(''):`<div class="empty-state">아직 ${escapeHTML(part.name)} 영역의 기록이 없습니다.<br>이 영역에서 작성한 기록이 날짜별로 여기에 모입니다.</div>`;
+  $('partBackdrop').classList.remove('hidden');document.body.style.overflow='hidden';
+}
+function closePartRecords(){$('partBackdrop').classList.add('hidden');document.body.style.overflow='';}
 
 $('emotions').innerHTML=EMOTIONS.map(e=>`<span class="chip" data-value="${e}">${e}</span>`).join('');
 $('emotions').addEventListener('click',e=>{if(e.target.classList.contains('chip')){e.target.classList.toggle('active');saveEntry(false);}});
@@ -1236,6 +1264,10 @@ $('homeBtn').onclick=()=>{saveEntry(false);showHome();};
 $('startToday').onclick=()=>showJournal(new Date());
 $('homeExportJson').onclick=exportJson;
 $('continueBtn').onclick=()=>{const d=$('continueBtn').dataset.date;if(d)showJournal(dateFromIso(d));};
+$('homePartGrid').addEventListener('click',e=>{const card=e.target.closest('[data-part-index]');if(card)openPartRecords(Number(card.dataset.partIndex));});
+$('partListClose').onclick=closePartRecords;
+$('partBackdrop').addEventListener('click',e=>{if(e.target===$('partBackdrop'))closePartRecords();});
+$('partRecordList').addEventListener('click',e=>{const edit=e.target.closest('[data-part-edit]');if(edit){const d=edit.dataset.partEdit;closePartRecords();showJournal(dateFromIso(d));return;}const del=e.target.closest('[data-part-delete]');if(del){const d=del.dataset.partDelete;closePartRecords();removeEntry(d);}});
 $('recentList').addEventListener('click',e=>{
   const edit=e.target.closest('[data-edit-date]'); if(edit){showJournal(dateFromIso(edit.dataset.editDate));return;}
   const del=e.target.closest('[data-delete-date]'); if(del){removeEntry(del.dataset.deleteDate);return;}
@@ -1257,6 +1289,7 @@ $('deleteCurrent').onclick=()=>removeEntry(isoDate(currentDate));
 document.addEventListener('keydown',e=>{
   if(e.key!=='Escape') return;
   if(!$('passwordBackdrop').classList.contains('hidden')) $('passwordClose').click();
+  else if(!$('partBackdrop').classList.contains('hidden')) closePartRecords();
   else if(!$('calendarBackdrop').classList.contains('hidden')) closeCalendar();
 });
 
