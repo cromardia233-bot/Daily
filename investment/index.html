@@ -3,60 +3,47 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#111111" />
+  <meta name="theme-color" content="#efefed" />
   <title>Investor Journal</title>
   <style>
-    :root{
-      --bg:#0c0c0c;
-      --panel:#151515;
-      --panel2:#1b1b1b;
-      --text:#f4f4f4;
-      --muted:#989898;
-      --line:#2a2a2a;
-      --soft:#222;
-      --good:#d8f5df;
-      --bad:#ffd7d7;
-      --warn:#fff0c9;
-      --accent:#f2f2f2;
-      --radius:18px;
-    }
+    :root{--bg:#efefed;--panel:#fff;--panel2:#f6f5f2;--text:#171717;--muted:#747474;--line:#ddddda;--soft:#f6f5f2;--good:#eaf5eb;--bad:#f9e9e6;--warn:#f8f1df;--accent:#222;--radius:14px}
     *{box-sizing:border-box}
     body{
-      margin:0;
-      background:var(--bg);
-      color:var(--text);
-      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Pretendard","Segoe UI",sans-serif;
+      margin:0;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+      background:var(--bg);color:var(--text);
+      font-family:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,-apple-system,sans-serif;
       -webkit-font-smoothing:antialiased;
     }
     button,input,select,textarea{font:inherit}
-    .app{max-width:920px;margin:0 auto;padding:24px 18px 100px}
+    .app{max-width:1080px;min-height:820px;margin:28px auto;padding:18px 48px 64px;background:#fff;border-radius:18px;box-shadow:0 12px 40px rgba(0,0,0,.06);overflow:hidden}
     .topbar{
       display:flex;align-items:center;justify-content:space-between;
-      margin-bottom:22px;
+      margin-bottom:16px;padding:12px 0 22px;
     }
     .eyebrow{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
-    h1{font-size:30px;line-height:1.1;margin:4px 0 0}
-    h2{font-size:20px;margin:0}
+    h1,h2{font-family:Georgia,"Times New Roman","Batang",serif}
+    h1{font-size:40px;line-height:1.12;letter-spacing:-.03em;margin:4px 0 0}
+    h2{font-size:22px;margin:0}
     h3{font-size:15px;margin:0 0 10px}
     .muted{color:var(--muted)}
     .small{font-size:12px}
-    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px}
     .card{
       background:var(--panel);
       border:1px solid var(--line);
       border-radius:var(--radius);
       padding:16px;
     }
-    .stat .value{font-size:24px;font-weight:700;margin-top:6px}
+    .stat .value{font-family:Georgia,"Times New Roman",serif;font-size:29px;margin-top:6px}
     .stat .label{font-size:12px;color:var(--muted)}
-    button.stat{text-align:left;color:inherit;cursor:pointer;transition:.18s ease}.stat.clickable:hover{transform:translateY(-2px);border-color:#555;background:#1a1a1a}.stat.clickable:focus-visible{outline:2px solid #f2f2f2;outline-offset:2px}
-    .section{margin-top:18px}
+    button.stat{text-align:left;color:inherit;cursor:pointer;transition:.18s ease;background:var(--soft);border-color:transparent}.stat.clickable:hover{transform:translateY(-2px);border-color:#c9c9c5;background:#fff}.stat.clickable:focus-visible{outline:2px solid #222;outline-offset:2px}
+    .section{margin-top:30px}
     .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
     .btn{
       border:none;border-radius:12px;padding:10px 14px;cursor:pointer;
-      background:#f2f2f2;color:#111;font-weight:700;
+      background:#222;color:#fff;font-weight:700;
     }
-    .btn.secondary{background:var(--soft);color:var(--text);border:1px solid var(--line)}
+    .btn.secondary{background:#fff;color:var(--text);border:1px solid #cfcfcb}
     .btn.ghost{background:transparent;color:var(--muted);padding:8px 10px}
     .list{display:flex;flex-direction:column;gap:8px}
     .item{
@@ -68,62 +55,54 @@
     .item-sub{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.4}
     .pill{
       font-size:11px;border:1px solid var(--line);padding:6px 8px;border-radius:999px;
-      white-space:nowrap;color:#ddd;
+      white-space:nowrap;color:#555;background:#fff;
     }
-    .pill.buy,.pill.add{background:#162219}
-    .pill.reduce,.pill.sell{background:#2b1717}
-    .pill.watch,.pill.hold{background:#252117}
+    .pill.buy,.pill.add{background:var(--good);color:#32623d;border-color:#c8dec9}
+    .pill.reduce,.pill.sell{background:var(--bad);color:#8b463e;border-color:#e8c8c2}
+    .pill.watch,.pill.hold{background:var(--warn);color:#786432;border-color:#e5d9b9}
     .empty{padding:26px 8px;text-align:center;color:var(--muted);font-size:13px}
-    .nav{
-      position:fixed;left:50%;transform:translateX(-50%);bottom:0;
-      width:min(920px,100%);display:grid;grid-template-columns:repeat(5,1fr);
-      background:rgba(14,14,14,.94);backdrop-filter:blur(18px);
-      border-top:1px solid var(--line);padding:8px 8px calc(8px + env(safe-area-inset-bottom));
-      z-index:50;
-    }
+    .nav{position:sticky;top:0;z-index:50;display:flex;gap:7px;overflow:auto;background:rgba(255,255,255,.94);backdrop-filter:blur(18px);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:34px}
     .nav button{
-      background:none;border:none;color:#777;font-size:11px;padding:9px 2px;cursor:pointer;
+      background:none;border:none;color:#777;font-size:12px;padding:8px 12px;border-radius:999px;cursor:pointer;white-space:nowrap;
     }
-    .nav button.active{color:white;font-weight:700}
+    .nav button.active{color:white;background:#222;font-weight:700}
     .nav .ico{display:block;font-size:18px;margin-bottom:4px}
     .page{display:none}
     .page.active{display:block}
     .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
     input,select,textarea{
-      width:100%;background:#111;color:white;border:1px solid var(--line);border-radius:12px;
+      width:100%;background:#fff;color:#171717;border:1px solid #dededb;border-radius:12px;
       padding:12px;outline:none;
     }
     textarea{min-height:90px;resize:vertical}
     .full{grid-column:1/-1}
     .modal{
-      display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100;
-      align-items:flex-end;justify-content:center;
+      display:none;position:fixed;inset:0;background:rgba(20,20,18,.46);z-index:100;align-items:center;justify-content:center;padding:20px;
     }
     .modal.open{display:flex}
     .sheet{
-      width:min(920px,100%);max-height:92vh;overflow:auto;background:#101010;border:1px solid var(--line);
-      border-radius:24px 24px 0 0;padding:20px 18px calc(28px + env(safe-area-inset-bottom));
+      width:min(920px,100%);max-height:92vh;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:22px;padding:22px;
     }
     .sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
     .kicker{font-size:12px;color:var(--muted);margin-bottom:5px}
-    .thesis-box{background:var(--panel2);border-radius:14px;padding:12px;margin-top:8px}
-    .progress{height:8px;border-radius:999px;background:#242424;overflow:hidden}
-    .progress>div{height:100%;background:#f2f2f2}
+    .thesis-box{background:var(--panel2);border-radius:14px;padding:12px;margin-top:8px;line-height:1.65}
+    .progress{height:8px;border-radius:999px;background:#e7e5e0;overflow:hidden}
+    .progress>div{height:100%;background:#222}
     .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .table{width:100%;border-collapse:collapse;font-size:13px}
     .table th,.table td{padding:10px 6px;border-bottom:1px solid var(--line);text-align:left}
     .table th{color:var(--muted);font-weight:500}
     .tag{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:5px 8px;font-size:11px;margin:3px 4px 0 0}
-    .danger{color:#ffb0b0}
+    .danger{color:#9a4139}
     .toolbar{display:flex;gap:8px;flex-wrap:wrap}
-    .toolbar input,.toolbar select{width:auto;min-width:150px}.metric-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.metric-chip{font-size:10px;color:#bbb;border:1px solid var(--line);border-radius:999px;padding:4px 7px}
-    .hero-note{font-size:13px;line-height:1.5;color:#ccc;margin-top:10px}
+    .toolbar input,.toolbar select{width:auto;min-width:150px}.metric-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.metric-chip{font-size:10px;color:#777;border:1px solid var(--line);border-radius:999px;padding:4px 7px}
+    .hero-note{font-size:13px;line-height:1.7;color:#666;margin-top:10px}.investment-hero{display:grid;grid-template-columns:1.35fr .65fr;gap:28px;align-items:end;padding-bottom:30px;border-bottom:1px solid var(--line)}.investment-hero h2{font-size:34px;line-height:1.25;letter-spacing:-.025em}.hero-flow{border:1px solid var(--line);border-radius:14px;padding:18px 20px;background:#fcfcfa}.hero-flow strong{display:block;font-family:Georgia,"Times New Roman",serif;font-size:18px;margin-bottom:7px}.hero-flow span{font-size:12px;line-height:1.7;color:#777}.section-title{display:flex;align-items:end;justify-content:space-between;gap:14px;margin-bottom:12px}.section-title .eyebrow{margin-bottom:5px}
     @media(max-width:700px){
       .grid{grid-template-columns:1fr 1fr}
-      .form-grid,.two-col{grid-template-columns:1fr}
-      h1{font-size:27px}
-      .app{padding-top:18px}
+      .form-grid,.two-col,.investment-hero{grid-template-columns:1fr}
+      h1{font-size:32px}.investment-hero h2{font-size:28px}
+      .app{margin:0;padding:12px 20px 42px;border-radius:0;box-shadow:none;min-height:100vh}.topbar{align-items:flex-end}.nav{margin-left:-20px;margin-right:-20px;padding-left:20px;padding-right:20px}.sheet{padding:20px 18px;border-radius:20px}.modal{align-items:flex-end;padding:0}.sheet{border-radius:22px 22px 0 0;max-height:94vh}.item{gap:8px}
     }
   </style>
 </head>
@@ -134,28 +113,39 @@
   </div>
   <div class="topbar">
     <div>
-      <div class="eyebrow">Investor Journal</div>
-      <h1 id="pageTitle">Dashboard</h1>
+      <div class="eyebrow">INVESTOR JOURNAL</div>
+      <h1 id="pageTitle">투자 판단 기록</h1>
     </div>
     <button class="btn" id="newDecisionBtn">+ 판단 기록</button>
   </div>
 
+  <nav class="nav" aria-label="투자일지 메뉴">
+    <button class="active" data-page="dashboard">홈</button>
+    <button data-page="decisions">판단 기록</button>
+    <button data-page="companies">회사별 보기</button>
+    <button data-page="reviews">검증 대기</button>
+    <button data-page="insights">인사이트·설정</button>
+  </nav>
+
   <section class="page active" id="dashboard">
-    <div class="grid">
-      <button class="card stat clickable" data-stat-page="decisions"><div class="label">Total Decisions · 보기</div><div class="value" id="sTotal">0</div></button>
-      <button class="card stat clickable" data-stat-page="companies"><div class="label">Companies · 보기</div><div class="value" id="sCompanies">0</div></button>
-      <button class="card stat clickable" data-stat-page="reviews"><div class="label">Reviewed · 검증 목록</div><div class="value" id="sReviewed">0%</div></button>
-      <button class="card stat clickable" data-stat-page="insights"><div class="label">Avg Confidence · 분석</div><div class="value" id="sConfidence">-</div></button>
+    <div class="investment-hero">
+      <div>
+        <div class="eyebrow">THINK · DECIDE · REVIEW</div>
+        <h2>투자 판단을 기록하고,<br>현실과 비교해 나만의 원칙으로</h2>
+        <div class="hero-note">매수·관망·매도 당시의 생각과 가정을 남기고, 시간이 지난 뒤 결과를 검증합니다.</div>
+      </div>
+      <div class="hero-flow"><strong>기록이 쌓이는 순서</strong><span>리서치 → 투자 논리 → 예상 → 판단 → 실제 결과 → 복기 → 원칙</span></div>
     </div>
 
-    <div class="section card">
-      <div class="kicker">Core loop</div>
-      <h2>판단을 기록하고, 현실과 비교하고, 규칙으로 남긴다.</h2>
-      <div class="hero-note">Research → Thesis → Prediction → Decision → Reality → Review → Lesson → Rule</div>
+    <div class="grid">
+      <button class="card stat clickable" data-stat-page="decisions"><div class="value" id="sTotal">0</div><div class="label">전체 판단 · 눌러서 보기</div></button>
+      <button class="card stat clickable" data-stat-page="companies"><div class="value" id="sCompanies">0</div><div class="label">기록한 회사 · 모아보기</div></button>
+      <button class="card stat clickable" data-stat-page="reviews"><div class="value" id="sReviewed">0%</div><div class="label">검증 완료율 · 검증하기</div></button>
+      <button class="card stat clickable" data-stat-page="insights"><div class="value" id="sConfidence">-</div><div class="label">평균 확신도 · 분석 보기</div></button>
     </div>
 
     <div class="section">
-      <div class="section-head"><h2>최근 판단</h2><button class="btn ghost" onclick="showPage('decisions')">전체보기</button></div>
+      <div class="section-title"><div><div class="eyebrow">RECENT DECISIONS</div><h2>최근 투자 판단</h2></div><button class="btn ghost" onclick="showPage('decisions')">전체보기 →</button></div>
       <div class="list" id="recentDecisions"></div>
     </div>
 
@@ -172,7 +162,7 @@
 
   <section class="page" id="decisions">
     <div class="section-head">
-      <h2>Decision Log</h2>
+      <h2>투자 판단 기록</h2>
       <div class="toolbar">
         <input id="decisionSearch" type="text" placeholder="회사·논리 검색" aria-label="판단 검색">
         <select id="decisionFilter" style="width:auto" onchange="renderDecisions()">
@@ -186,12 +176,12 @@
   </section>
 
   <section class="page" id="companies">
-    <div class="section-head"><h2>Companies</h2></div>
+    <div class="section-head"><h2>회사별 기록</h2></div>
     <div class="list" id="companyList"></div>
   </section>
 
   <section class="page" id="reviews">
-    <div class="section-head"><h2>Review Queue</h2></div>
+    <div class="section-head"><h2>검증 대기 목록</h2></div>
     <div class="list" id="reviewList"></div>
   </section>
 
@@ -208,7 +198,7 @@
     </div>
 
     <div class="section card">
-      <h3>Data Backup</h3>
+      <h3>기록 관리</h3>
       <div class="toolbar">
         <button class="btn secondary" id="migrateBtn">기존 기록 가져오기</button>
         <button class="btn secondary" id="passwordBtn">비밀번호 설정</button>
@@ -221,19 +211,11 @@
     </div>
 
     <div class="section">
-      <div class="section-head"><h2>Lessons & Rules</h2></div>
+      <div class="section-head"><h2>배운 점과 투자 원칙</h2></div>
       <div class="list" id="lessonList"></div>
     </div>
   </section>
 </div>
-
-<nav class="nav">
-  <button class="active" data-page="dashboard"><span class="ico">⌂</span>Dashboard</button>
-  <button data-page="decisions"><span class="ico">◫</span>Decisions</button>
-  <button data-page="companies"><span class="ico">◎</span>Companies</button>
-  <button data-page="reviews"><span class="ico">✓</span>Reviews</button>
-  <button data-page="insights"><span class="ico">✦</span>Insights</button>
-</nav>
 
 <div class="modal" id="decisionModal">
   <div class="sheet">
@@ -350,7 +332,7 @@ function showPage(page){
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   document.getElementById(page).classList.add('active');
   document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
-  const titles={dashboard:'Dashboard',decisions:'Decision Log',companies:'Companies',reviews:'Review Queue',insights:'Insights'};
+  const titles={dashboard:'투자 판단 기록',decisions:'투자 판단 모아보기',companies:'회사별 기록',reviews:'검증 대기',insights:'인사이트와 설정'};
   document.getElementById('pageTitle').textContent=titles[page];
   window.scrollTo({top:0,behavior:'smooth'});
 }
