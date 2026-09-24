@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#111111" />
+  <title>Investor Journal</title>
+  <style>
+    :root{
+      --bg:#0c0c0c;
+      --panel:#151515;
+      --panel2:#1b1b1b;
+      --text:#f4f4f4;
+      --muted:#989898;
+      --line:#2a2a2a;
+      --soft:#222;
+      --good:#d8f5df;
+      --bad:#ffd7d7;
+      --warn:#fff0c9;
+      --accent:#f2f2f2;
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Pretendard","Segoe UI",sans-serif;
+      -webkit-font-smoothing:antialiased;
+    }
+    button,input,select,textarea{font:inherit}
+    .app{max-width:920px;margin:0 auto;padding:24px 18px 100px}
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;
+      margin-bottom:22px;
+    }
+    .eyebrow{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+    h1{font-size:30px;line-height:1.1;margin:4px 0 0}
+    h2{font-size:20px;margin:0}
+    h3{font-size:15px;margin:0 0 10px}
+    .muted{color:var(--muted)}
+    .small{font-size:12px}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .card{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:16px;
+    }
+    .stat .value{font-size:24px;font-weight:700;margin-top:6px}
+    .stat .label{font-size:12px;color:var(--muted)}
+    .section{margin-top:18px}
+    .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .btn{
+      border:none;border-radius:12px;padding:10px 14px;cursor:pointer;
+      background:#f2f2f2;color:#111;font-weight:700;
+    }
+    .btn.secondary{background:var(--soft);color:var(--text);border:1px solid var(--line)}
+    .btn.ghost{background:transparent;color:var(--muted);padding:8px 10px}
+    .list{display:flex;flex-direction:column;gap:8px}
+    .item{
+      background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:14px;
+      display:flex;gap:12px;align-items:flex-start;justify-content:space-between;
+    }
+    .item-main{min-width:0}
+    .item-title{font-weight:700}
+    .item-sub{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.4}
+    .pill{
+      font-size:11px;border:1px solid var(--line);padding:6px 8px;border-radius:999px;
+      white-space:nowrap;color:#ddd;
+    }
+    .pill.buy,.pill.add{background:#162219}
+    .pill.reduce,.pill.sell{background:#2b1717}
+    .pill.watch,.pill.hold{background:#252117}
+    .empty{padding:26px 8px;text-align:center;color:var(--muted);font-size:13px}
+    .nav{
+      position:fixed;left:50%;transform:translateX(-50%);bottom:0;
+      width:min(920px,100%);display:grid;grid-template-columns:repeat(5,1fr);
+      background:rgba(14,14,14,.94);backdrop-filter:blur(18px);
+      border-top:1px solid var(--line);padding:8px 8px calc(8px + env(safe-area-inset-bottom));
+      z-index:50;
+    }
+    .nav button{
+      background:none;border:none;color:#777;font-size:11px;padding:9px 2px;cursor:pointer;
+    }
+    .nav button.active{color:white;font-weight:700}
+    .nav .ico{display:block;font-size:18px;margin-bottom:4px}
+    .page{display:none}
+    .page.active{display:block}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    input,select,textarea{
+      width:100%;background:#111;color:white;border:1px solid var(--line);border-radius:12px;
+      padding:12px;outline:none;
+    }
+    textarea{min-height:90px;resize:vertical}
+    .full{grid-column:1/-1}
+    .modal{
+      display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100;
+      align-items:flex-end;justify-content:center;
+    }
+    .modal.open{display:flex}
+    .sheet{
+      width:min(920px,100%);max-height:92vh;overflow:auto;background:#101010;border:1px solid var(--line);
+      border-radius:24px 24px 0 0;padding:20px 18px calc(28px + env(safe-area-inset-bottom));
+    }
+    .sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .kicker{font-size:12px;color:var(--muted);margin-bottom:5px}
+    .thesis-box{background:var(--panel2);border-radius:14px;padding:12px;margin-top:8px}
+    .progress{height:8px;border-radius:999px;background:#242424;overflow:hidden}
+    .progress>div{height:100%;background:#f2f2f2}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .table{width:100%;border-collapse:collapse;font-size:13px}
+    .table th,.table td{padding:10px 6px;border-bottom:1px solid var(--line);text-align:left}
+    .table th{color:var(--muted);font-weight:500}
+    .tag{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:5px 8px;font-size:11px;margin:3px 4px 0 0}
+    .danger{color:#ffb0b0}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+    .hero-note{font-size:13px;line-height:1.5;color:#ccc;margin-top:10px}
+    @media(max-width:700px){
+      .grid{grid-template-columns:1fr 1fr}
+      .form-grid,.two-col{grid-template-columns:1fr}
+      h1{font-size:27px}
+      .app{padding-top:18px}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="journal-switcher" style="margin-bottom:16px">
+    <a href="../">관찰일지</a><a href="../me-time/">Me Time</a><a class="current" href="./">투자일지</a>
+  </div>
+  <div class="topbar">
+    <div>
+      <div class="eyebrow">Investor Journal</div>
+      <h1 id="pageTitle">Dashboard</h1>
+    </div>
+    <button class="btn" id="newDecisionBtn">+ 판단 기록</button>
+  </div>
+
+  <section class="page active" id="dashboard">
+    <div class="grid">
+      <div class="card stat"><div class="label">Total Decisions</div><div class="value" id="sTotal">0</div></div>
+      <div class="card stat"><div class="label">Companies</div><div class="value" id="sCompanies">0</div></div>
+      <div class="card stat"><div class="label">Reviewed</div><div class="value" id="sReviewed">0%</div></div>
+      <div class="card stat"><div class="label">Avg Confidence</div><div class="value" id="sConfidence">-</div></div>
+    </div>
+
+    <div class="section card">
+      <div class="kicker">Core loop</div>
+      <h2>판단을 기록하고, 현실과 비교하고, 규칙으로 남긴다.</h2>
+      <div class="hero-note">Research → Thesis → Prediction → Decision → Reality → Review → Lesson → Rule</div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><h2>최근 판단</h2><button class="btn ghost" onclick="showPage('decisions')">전체보기</button></div>
+      <div class="list" id="recentDecisions"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><h2>검증 대기</h2><span class="small muted" id="reviewDueCount">0건</span></div>
+      <div class="list" id="reviewDue"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><h2>최근 학습</h2><button class="btn ghost" onclick="showPage('insights')">Insights</button></div>
+      <div class="list" id="recentLessons"></div>
+    </div>
+  </section>
+
+  <section class="page" id="decisions">
+    <div class="section-head">
+      <h2>Decision Log</h2>
+      <div class="toolbar">
+        <select id="decisionFilter" style="width:auto" onchange="renderDecisions()">
+          <option value="">전체</option>
+          <option>BUY</option><option>ADD</option><option>HOLD</option><option>WATCH</option><option>REDUCE</option><option>SELL</option>
+        </select>
+      </div>
+    </div>
+    <div class="list" id="decisionList"></div>
+  </section>
+
+  <section class="page" id="companies">
+    <div class="section-head"><h2>Companies</h2></div>
+    <div class="list" id="companyList"></div>
+  </section>
+
+  <section class="page" id="reviews">
+    <div class="section-head"><h2>Review Queue</h2></div>
+    <div class="list" id="reviewList"></div>
+  </section>
+
+  <section class="page" id="insights">
+    <div class="two-col">
+      <div class="card">
+        <h3>반복되는 오류</h3>
+        <div id="mistakeStats"></div>
+      </div>
+      <div class="card">
+        <h3>판단 분포</h3>
+        <div id="decisionStats"></div>
+      </div>
+    </div>
+
+    <div class="section card">
+      <h3>Data Backup</h3>
+      <div class="toolbar">
+        <button class="btn secondary" id="migrateBtn">기존 기록 가져오기</button>
+        <button class="btn secondary" id="passwordBtn">비밀번호 설정</button>
+        <button class="btn secondary" id="logoutBtn">로그아웃</button>
+        <button class="btn secondary" onclick="exportData()">JSON 내보내기</button>
+        <label class="btn secondary" style="margin:0;cursor:pointer">JSON 불러오기<input id="importFile" type="file" accept=".json" style="display:none"></label>
+        <button class="btn secondary danger" onclick="resetAll()">전체 초기화</button>
+      </div>
+      <div class="small muted" style="margin-top:10px">기록은 로그인한 계정의 Supabase 저장소에 동기화됩니다.</div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><h2>Lessons & Rules</h2></div>
+      <div class="list" id="lessonList"></div>
+    </div>
+  </section>
+</div>
+
+<nav class="nav">
+  <button class="active" data-page="dashboard"><span class="ico">⌂</span>Dashboard</button>
+  <button data-page="decisions"><span class="ico">◫</span>Decisions</button>
+  <button data-page="companies"><span class="ico">◎</span>Companies</button>
+  <button data-page="reviews"><span class="ico">✓</span>Reviews</button>
+  <button data-page="insights"><span class="ico">✦</span>Insights</button>
+</nav>
+
+<div class="modal" id="decisionModal">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div><div class="kicker">New Investment Decision</div><h2>투자 판단 기록</h2></div>
+      <button class="btn ghost" onclick="closeModal('decisionModal')">닫기</button>
+    </div>
+    <form id="decisionForm" class="form-grid">
+      <input type="hidden" name="editingId">
+      <div><label>회사 / 티커</label><input name="company" placeholder="예: Rheinmetall / RHM.DE" required></div>
+      <div><label>판단</label><select name="decision" required><option>WATCH</option><option>BUY</option><option>ADD</option><option>HOLD</option><option>REDUCE</option><option>SELL</option></select></div>
+      <div><label>Confidence (%)</label><input name="confidence" type="number" min="0" max="100" value="60"></div>
+      <div><label>Time Horizon</label><select name="horizon"><option>1M</option><option>3M</option><option>6M</option><option>1Y</option><option selected>3Y</option><option>5Y+</option></select></div>
+      <div class="full"><label>Why? — 내가 왜 이렇게 판단하는가</label><textarea name="why" placeholder="핵심 논리를 한 문단으로"></textarea></div>
+      <div class="full"><label>Market Belief — 시장은 무엇을 믿고 있는가</label><textarea name="market" placeholder="현재 가격에 반영된 기대"></textarea></div>
+      <div class="full"><label>My Edge — 나는 어디서 다르게 보는가</label><textarea name="edge" placeholder="내 기대와 시장 기대의 차이"></textarea></div>
+      <div class="full"><label>Key Assumptions — 검증 가능한 가정</label><textarea name="assumptions" placeholder="한 줄에 하나씩&#10;예: 2027년까지 유럽 방위비 CAGR 10%+&#10;예: EBIT margin 15% 도달"></textarea></div>
+      <div><label>예상 수치 1</label><input name="metric1" placeholder="예: FY27 Revenue €18bn"></div>
+      <div><label>예상 수치 2</label><input name="metric2" placeholder="예: EBIT Margin 15%"></div>
+      <div><label>Upside Trigger</label><input name="upTrigger" placeholder="예: 수주 성장 가속"></div>
+      <div><label>Downside Trigger</label><input name="downTrigger" placeholder="예: backlog conversion 둔화"></div>
+      <div><label>검증 예정일</label><input name="reviewDate" type="date"></div>
+      <div><label>현재 가격 (선택)</label><input name="price" type="number" step="0.01" placeholder="숫자만"></div>
+      <div><label>Upside 목표가격</label><input name="upsideTarget" type="number" step="0.01" placeholder="낙관 시나리오 목표"></div>
+      <div class="full"><label>Upside Case</label><textarea name="upsideCase" placeholder="무엇이 맞으면 상승 시나리오가 실현되는가"></textarea></div>
+      <div><label>Downside 목표가격</label><input name="downsideTarget" type="number" step="0.01" placeholder="비관 시나리오 목표"></div>
+      <div class="full"><label>Downside Case</label><textarea name="downsideCase" placeholder="무엇이 틀리면 하락 시나리오가 실현되는가"></textarea></div>
+      <div class="full"><button class="btn" type="submit" style="width:100%">저장</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal" id="reviewModal">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div><div class="kicker">Decision Review</div><h2 id="reviewTitle">판단 검증</h2></div>
+      <button class="btn ghost" onclick="closeModal('reviewModal')">닫기</button>
+    </div>
+    <div id="reviewOriginal" class="card" style="margin-bottom:12px"></div>
+    <form id="reviewForm" class="form-grid">
+      <input type="hidden" name="decisionId">
+      <div><label>Outcome</label><select name="outcome"><option>좋음</option><option>혼합</option><option>나쁨</option></select></div>
+      <div><label>판단의 질</label><select name="quality"><option>좋은 판단</option><option>보통</option><option>나쁜 판단</option></select></div>
+      <div class="full"><label>What actually happened?</label><textarea name="reality" placeholder="실제로 어떤 일이 일어났는가"></textarea></div>
+      <div class="full"><label>Which assumption was wrong/right?</label><textarea name="assumptionReview" placeholder="핵심 가정별 검증"></textarea></div>
+      <div><label>Mistake Category</label><select name="mistake"><option value="">없음</option><option>Demand</option><option>Margin</option><option>Valuation</option><option>Timing</option><option>Position Sizing</option><option>Competitive Advantage</option><option>Macro</option><option>Other</option></select></div>
+      <div><label>Confidence now (%)</label><input name="confidenceNow" type="number" min="0" max="100"></div>
+      <div class="full"><label>Lesson</label><textarea name="lesson" placeholder="이번 판단에서 배운 점"></textarea></div>
+      <div class="full"><label>Rule Created / Updated</label><textarea name="rule" placeholder="다음 투자판단에서 적용할 규칙"></textarea></div>
+      <div class="full"><button class="btn" type="submit" style="width:100%">검증 저장</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal" id="detailModal">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div><div class="kicker">Decision Detail</div><h2 id="detailTitle"></h2></div>
+      <button class="btn ghost" onclick="closeModal('detailModal')">닫기</button>
+    </div>
+    <div id="detailBody"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../shared/cloud.js"></script>
+<script>
+const KEY = 'investorJournal_v1';
+const cloud = window.JournalCloud.client;
+let legacyData = {decisions:[],reviews:[]};
+try{ legacyData = JSON.parse(localStorage.getItem(KEY) || '{"decisions":[],"reviews":[]}'); }catch(_){}
+let data = {decisions:[],reviews:[]};
+let currentUser = null;
+
+async function loadCloud(){
+  const [{data:decisions,error:de},{data:reviews,error:re}] = await Promise.all([
+    cloud.from('investment_decisions').select('*').order('created_at',{ascending:false}),
+    cloud.from('investment_reviews').select('*').order('created_at',{ascending:true})
+  ]);
+  if(de || re){ alert('투자일지를 불러오지 못했습니다: '+(de||re).message); return; }
+  data={decisions:(decisions||[]).map(x=>x.payload),reviews:(reviews||[]).map(x=>x.payload)};
+  renderAll();
+}
+
+async function save(){
+  renderAll();
+  if(!currentUser) return;
+  const decisionRows=data.decisions.map(d=>({id:d.id,user_id:currentUser.id,payload:d,created_at:d.createdAt||new Date().toISOString(),updated_at:new Date().toISOString()}));
+  const reviewRows=data.reviews.map(r=>({id:r.id||('r_'+r.decisionId),user_id:currentUser.id,decision_id:r.decisionId,payload:{...r,id:r.id||('r_'+r.decisionId)},created_at:r.createdAt||new Date().toISOString(),updated_at:new Date().toISOString()}));
+  const [a,b]=await Promise.all([
+    decisionRows.length?cloud.from('investment_decisions').upsert(decisionRows,{onConflict:'id'}):Promise.resolve({error:null}),
+    reviewRows.length?cloud.from('investment_reviews').upsert(reviewRows,{onConflict:'decision_id'}):Promise.resolve({error:null})
+  ]);
+  if(a.error||b.error) alert('동기화하지 못했습니다: '+(a.error||b.error).message);
+}
+
+function esc(s=''){
+  return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
+
+function fmtDate(s){
+  if(!s) return '-';
+  return new Date(s).toLocaleDateString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit'});
+}
+
+function daysFromNow(s){
+  if(!s) return null;
+  const a = new Date(); a.setHours(0,0,0,0);
+  const b = new Date(s); b.setHours(0,0,0,0);
+  return Math.round((b-a)/86400000);
+}
+
+function showPage(page){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.getElementById(page).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+  const titles={dashboard:'Dashboard',decisions:'Decision Log',companies:'Companies',reviews:'Review Queue',insights:'Insights'};
+  document.getElementById('pageTitle').textContent=titles[page];
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>showPage(b.dataset.page));
+document.getElementById('newDecisionBtn').onclick=()=>{
+  const form=document.getElementById('decisionForm');form.reset();form.elements.namedItem('confidence').value=60;form.elements.namedItem('editingId').value='';
+  document.querySelector('#decisionModal .kicker').textContent='New Investment Decision';
+  document.querySelector('#decisionModal h2').textContent='투자 판단 기록';
+  document.getElementById('decisionModal').classList.add('open');
+};
+
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+document.getElementById('decisionForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const f=new FormData(e.target);
+  const d=Object.fromEntries(f.entries());
+  const editingId=d.editingId;
+  delete d.editingId;
+  const previous=data.decisions.find(x=>x.id===editingId);
+  d.id=previous?.id || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()));
+  d.createdAt=previous?.createdAt || new Date().toISOString();
+  d.confidence=Number(d.confidence||0);
+  d.price=d.price?Number(d.price):null;
+  d.upsideTarget=d.upsideTarget?Number(d.upsideTarget):null;
+  d.downsideTarget=d.downsideTarget?Number(d.downsideTarget):null;
+  d.assumptionList=(d.assumptions||'').split('\n').map(x=>x.trim()).filter(Boolean).map(x=>({text:x,status:'Pending'}));
+  data.decisions=previous?data.decisions.map(x=>x.id===d.id?d:x):[d,...data.decisions];
+  save();
+  e.target.reset();
+  e.target.querySelector('[name="confidence"]').value=60;
+  closeModal('decisionModal');
+});
+
+function editDecision(id){
+  const d=data.decisions.find(x=>x.id===id); if(!d)return;
+  closeModal('detailModal');
+  const form=document.getElementById('decisionForm');
+  Object.entries(d).forEach(([key,value])=>{
+    const field=form.elements.namedItem(key);
+    if(field && !['assumptionList','id'].includes(key)) field.value=value??'';
+  });
+  form.elements.namedItem('editingId').value=d.id;
+  form.elements.namedItem('assumptions').value=(d.assumptionList||[]).map(x=>x.text).join('\n') || d.assumptions || '';
+  document.querySelector('#decisionModal .kicker').textContent='Edit Investment Decision';
+  document.querySelector('#decisionModal h2').textContent='투자 판단 수정';
+  document.getElementById('decisionModal').classList.add('open');
+}
+
+function decisionCard(d){
+  const rev=data.reviews.find(r=>r.decisionId===d.id);
+  const due=daysFromNow(d.reviewDate);
+  let dueText='';
+  if(d.reviewDate){
+    dueText = due<0 ? `검증 ${Math.abs(due)}일 지남` : due===0 ? '오늘 검증' : `검증 D-${due}`;
+  }
+  return `
+  <div class="item">
+    <div class="item-main" onclick="openDetail('${d.id}')" style="cursor:pointer;flex:1">
+      <div class="item-title">${esc(d.company)}</div>
+      <div class="item-sub">${fmtDate(d.createdAt)} · Confidence ${d.confidence}% · ${esc(d.horizon||'')}</div>
+      <div class="item-sub">${esc(d.why||'기록 없음')}</div>
+      ${dueText?`<div class="item-sub">${dueText}</div>`:''}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:7px;align-items:flex-end">
+      <span class="pill ${d.decision.toLowerCase()}">${esc(d.decision)}</span>
+      ${rev?'<span class="pill">Reviewed</span>':`<button class="btn ghost" onclick="openReview('${d.id}')">검증</button>`}
+    </div>
+  </div>`;
+}
+
+function renderDashboard(){
+  const total=data.decisions.length;
+  const companies=new Set(data.decisions.map(d=>d.company.trim().toLowerCase())).size;
+  const reviewed=data.reviews.length;
+  const avg=total?Math.round(data.decisions.reduce((s,d)=>s+(Number(d.confidence)||0),0)/total):0;
+  document.getElementById('sTotal').textContent=total;
+  document.getElementById('sCompanies').textContent=companies;
+  document.getElementById('sReviewed').textContent=total?Math.round(reviewed/total*100)+'%':'0%';
+  document.getElementById('sConfidence').textContent=total?avg+'%':'-';
+
+  document.getElementById('recentDecisions').innerHTML = total ? data.decisions.slice(0,5).map(decisionCard).join('') : '<div class="empty">아직 기록된 투자 판단이 없습니다.</div>';
+
+  const due=data.decisions.filter(d=>!data.reviews.some(r=>r.decisionId===d.id) && d.reviewDate && daysFromNow(d.reviewDate)<=0);
+  document.getElementById('reviewDueCount').textContent=due.length+'건';
+  document.getElementById('reviewDue').innerHTML=due.length?due.slice(0,5).map(decisionCard).join(''):'<div class="empty">현재 검증이 밀린 판단이 없습니다.</div>';
+
+  const lessons=data.reviews.filter(r=>r.lesson).slice().reverse().slice(0,4);
+  document.getElementById('recentLessons').innerHTML=lessons.length?lessons.map(r=>{
+    const d=data.decisions.find(x=>x.id===r.decisionId);
+    return `<div class="item"><div><div class="item-title">${esc(d?.company||'')}</div><div class="item-sub">${esc(r.lesson)}</div></div></div>`;
+  }).join(''):'<div class="empty">검증이 쌓이면 학습 내용이 여기에 나타납니다.</div>';
+}
+
+function renderDecisions(){
+  const filter=document.getElementById('decisionFilter').value;
+  const arr=filter?data.decisions.filter(d=>d.decision===filter):data.decisions;
+  document.getElementById('decisionList').innerHTML=arr.length?arr.map(decisionCard).join(''):'<div class="empty">해당 판단이 없습니다.</div>';
+}
+
+function renderCompanies(){
+  const map={};
+  data.decisions.forEach(d=>{
+    const k=d.company.trim();
+    if(!map[k]) map[k]=[];
+    map[k].push(d);
+  });
+  const companies=Object.entries(map).sort((a,b)=>new Date(b[1][0].createdAt)-new Date(a[1][0].createdAt));
+  document.getElementById('companyList').innerHTML=companies.length?companies.map(([name,arr])=>{
+    const last=arr[0], reviewed=arr.filter(d=>data.reviews.some(r=>r.decisionId===d.id)).length;
+    return `<div class="item" onclick="openCompany('${encodeURIComponent(name)}')" style="cursor:pointer">
+      <div class="item-main">
+        <div class="item-title">${esc(name)}</div>
+        <div class="item-sub">${arr.length} decisions · ${reviewed} reviewed · Last ${fmtDate(last.createdAt)}</div>
+        <div class="item-sub">${esc(last.why||'')}</div>
+      </div>
+      <span class="pill ${last.decision.toLowerCase()}">${esc(last.decision)}</span>
+    </div>`;
+  }).join(''):'<div class="empty">회사별 판단 기록이 아직 없습니다.</div>';
+}
+
+function renderReviews(){
+  const pending=data.decisions.filter(d=>!data.reviews.some(r=>r.decisionId===d.id));
+  pending.sort((a,b)=>{
+    if(!a.reviewDate && !b.reviewDate) return new Date(b.createdAt)-new Date(a.createdAt);
+    if(!a.reviewDate) return 1;if(!b.reviewDate) return -1;
+    return new Date(a.reviewDate)-new Date(b.reviewDate);
+  });
+  document.getElementById('reviewList').innerHTML=pending.length?pending.map(decisionCard).join(''):'<div class="empty">모든 판단이 검증되었습니다.</div>';
+}
+
+function renderInsights(){
+  const counts={};
+  data.reviews.forEach(r=>{ if(r.mistake) counts[r.mistake]=(counts[r.mistake]||0)+1; });
+  const mistakes=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('mistakeStats').innerHTML=mistakes.length?mistakes.map(([k,v])=>`
+    <div style="margin:12px 0">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span>${esc(k)}</span><span>${v}</span></div>
+      <div class="progress"><div style="width:${Math.min(100,v/Math.max(1,data.reviews.length)*100)}%"></div></div>
+    </div>`).join(''):'<div class="empty">리뷰가 쌓이면 오류 패턴이 보입니다.</div>';
+
+  const dc={};
+  data.decisions.forEach(d=>dc[d.decision]=(dc[d.decision]||0)+1);
+  document.getElementById('decisionStats').innerHTML=Object.keys(dc).length?Object.entries(dc).map(([k,v])=>`<span class="tag">${k} ${v}</span>`).join(''):'<div class="empty">아직 데이터가 없습니다.</div>';
+
+  const revs=data.reviews.slice().reverse();
+  document.getElementById('lessonList').innerHTML=revs.length?revs.map(r=>{
+    const d=data.decisions.find(x=>x.id===r.decisionId);
+    return `<div class="item"><div class="item-main">
+      <div class="item-title">${esc(d?.company||'')} · ${esc(r.quality||'')}</div>
+      <div class="item-sub"><b>Lesson</b> ${esc(r.lesson||'-')}</div>
+      <div class="item-sub"><b>Rule</b> ${esc(r.rule||'-')}</div>
+      ${r.mistake?`<div class="item-sub">Mistake: ${esc(r.mistake)}</div>`:''}
+    </div></div>`;
+  }).join(''):'<div class="empty">판단 검증 후 Lesson과 Rule이 축적됩니다.</div>';
+}
+
+function openReview(id){
+  const d=data.decisions.find(x=>x.id===id); if(!d)return;
+  document.getElementById('reviewTitle').textContent=d.company;
+  document.querySelector('#reviewForm [name="decisionId"]').value=id;
+  document.querySelector('#reviewForm [name="confidenceNow"]').value=d.confidence||'';
+  document.getElementById('reviewOriginal').innerHTML=`
+    <div class="kicker">${fmtDate(d.createdAt)} · ${esc(d.decision)} · Confidence ${d.confidence}%</div>
+    <div style="font-weight:700;margin-bottom:8px">${esc(d.why||'')}</div>
+    <div class="small muted">Market belief</div><div class="thesis-box">${esc(d.market||'-')}</div>
+    <div class="small muted" style="margin-top:10px">My edge</div><div class="thesis-box">${esc(d.edge||'-')}</div>`;
+  document.getElementById('reviewModal').classList.add('open');
+}
+
+document.getElementById('reviewForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const f=new FormData(e.target), r=Object.fromEntries(f.entries());
+  r.createdAt=new Date().toISOString();
+  data.reviews=data.reviews.filter(x=>x.decisionId!==r.decisionId);
+  data.reviews.push(r);
+  save();
+  e.target.reset();
+  closeModal('reviewModal');
+});
+
+function scenarioMetrics(d){
+  const price=Number(d.price),up=Number(d.upsideTarget),down=Number(d.downsideTarget);
+  if(!(price>0)) return '';
+  const upPct=up>0?((up/price-1)*100):null,downPct=down>0?((down/price-1)*100):null;
+  const reward=upPct!==null?Math.max(0,upPct):null,risk=downPct!==null?Math.abs(Math.min(0,downPct)):null;
+  const rr=reward!==null&&risk>0?reward/risk:null;
+  return `<div class="small muted" style="margin-top:10px">SCENARIO ASYMMETRY</div><div class="thesis-box">
+    현재 ${price.toLocaleString()}${upPct!==null?` · Upside ${upPct.toFixed(1)}%`:''}${downPct!==null?` · Downside ${downPct.toFixed(1)}%`:''}${rr!==null?` · Reward/Risk ${rr.toFixed(2)}x`:''}
+  </div>${d.upsideCase?`<div class="thesis-box"><b>Upside Case</b><br>${esc(d.upsideCase)}</div>`:''}${d.downsideCase?`<div class="thesis-box"><b>Downside Case</b><br>${esc(d.downsideCase)}</div>`:''}`;
+}
+
+function openDetail(id){
+  const d=data.decisions.find(x=>x.id===id); if(!d)return;
+  const r=data.reviews.find(x=>x.decisionId===id);
+  document.getElementById('detailTitle').textContent=d.company;
+  document.getElementById('detailBody').innerHTML=`
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;gap:10px">
+        <div><div class="kicker">${fmtDate(d.createdAt)} · ${esc(d.horizon||'')}</div><h2>${esc(d.decision)}</h2></div>
+        <span class="pill">Confidence ${d.confidence}%</span>
+      </div>
+      <div class="small muted" style="margin-top:14px">WHY</div><div class="thesis-box">${esc(d.why||'-')}</div>
+      <div class="small muted" style="margin-top:10px">MARKET BELIEF</div><div class="thesis-box">${esc(d.market||'-')}</div>
+      <div class="small muted" style="margin-top:10px">MY EDGE</div><div class="thesis-box">${esc(d.edge||'-')}</div>
+      <div class="small muted" style="margin-top:10px">KEY ASSUMPTIONS</div>
+      <div class="thesis-box">${d.assumptionList?.length?d.assumptionList.map(a=>`<div>• ${esc(a.text)}</div>`).join(''):'-'}</div>
+      <div class="small muted" style="margin-top:10px">EXPECTATIONS</div>
+      <div class="thesis-box">${esc(d.metric1||'-')}<br>${esc(d.metric2||'')}</div>
+      <div class="small muted" style="margin-top:10px">TRIGGERS</div>
+      <div class="thesis-box">↑ ${esc(d.upTrigger||'-')}<br>↓ ${esc(d.downTrigger||'-')}</div>
+      ${scenarioMetrics(d)}
+    </div>
+    ${r?`<div class="card section">
+      <div class="kicker">REVIEW · ${fmtDate(r.createdAt)}</div>
+      <h3>${esc(r.quality||'')}</h3>
+      <div class="thesis-box"><b>Reality</b><br>${esc(r.reality||'-')}</div>
+      <div class="thesis-box"><b>Assumptions</b><br>${esc(r.assumptionReview||'-')}</div>
+      <div class="thesis-box"><b>Lesson</b><br>${esc(r.lesson||'-')}</div>
+      <div class="thesis-box"><b>Rule</b><br>${esc(r.rule||'-')}</div>
+    </div>`:`<div class="section"><button class="btn" onclick="closeModal('detailModal');openReview('${d.id}')">이 판단 검증하기</button></div>`}
+    <div class="section toolbar"><button class="btn secondary" onclick="editDecision('${d.id}')">이 기록 수정</button><button class="btn secondary danger" onclick="deleteDecision('${d.id}')">이 기록 삭제</button></div>
+  `;
+  document.getElementById('detailModal').classList.add('open');
+}
+
+function openCompany(encoded){
+  const name=decodeURIComponent(encoded);
+  const arr=data.decisions.filter(d=>d.company.trim()===name);
+  document.getElementById('detailTitle').textContent=name;
+  document.getElementById('detailBody').innerHTML=`
+    <div class="card">
+      <div class="kicker">Company Timeline</div>
+      <h2>${arr.length}개의 판단 기록</h2>
+      <div class="hero-note">같은 회사를 계속 추적하면 thesis의 변화와 판단의 일관성을 볼 수 있습니다.</div>
+    </div>
+    <div class="section list">${arr.map(decisionCard).join('')}</div>`;
+  document.getElementById('detailModal').classList.add('open');
+}
+
+async function deleteDecision(id){
+  if(!confirm('이 판단 기록과 연결된 리뷰를 삭제할까요?')) return;
+  const {error}=await cloud.from('investment_decisions').delete().eq('id',id);
+  if(error){alert(error.message);return;}
+  data.decisions=data.decisions.filter(d=>d.id!==id);
+  data.reviews=data.reviews.filter(r=>r.decisionId!==id);
+  renderAll(); closeModal('detailModal');
+}
+
+function exportData(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='investor-journal-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+document.getElementById('importFile').addEventListener('change',e=>{
+  const file=e.target.files[0]; if(!file)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const obj=JSON.parse(r.result);
+      if(!obj.decisions || !obj.reviews) throw new Error();
+      data=obj; save(); alert('불러오기 완료');
+    }catch{ alert('올바른 백업 파일이 아닙니다.'); }
+  };
+  r.readAsText(file);
+});
+
+async function resetAll(){
+  if(!confirm('모든 투자일지 데이터를 삭제할까요? 이 작업은 되돌릴 수 없습니다.')) return;
+  const [a,b]=await Promise.all([cloud.from('investment_reviews').delete().eq('user_id',currentUser.id),cloud.from('investment_decisions').delete().eq('user_id',currentUser.id)]);
+  if(a.error||b.error){alert((a.error||b.error).message);return;}
+  data={decisions:[],reviews:[]}; renderAll();
+}
+
+function renderAll(){
+  renderDashboard(); renderDecisions(); renderCompanies(); renderReviews(); renderInsights();
+}
+
+document.getElementById('migrateBtn').style.display=(legacyData.decisions?.length||legacyData.reviews?.length)?'inline-flex':'none';
+document.getElementById('migrateBtn').onclick=async()=>{
+  if(!confirm(`이 브라우저의 기존 판단 ${legacyData.decisions?.length||0}개와 리뷰 ${legacyData.reviews?.length||0}개를 계정으로 옮길까요?`))return;
+  data={decisions:[...(legacyData.decisions||[])],reviews:[...(legacyData.reviews||[])]};
+  await save();localStorage.setItem(KEY+':migrated:'+currentUser.id,new Date().toISOString());document.getElementById('migrateBtn').style.display='none';await loadCloud();alert('기존 투자 기록을 모두 옮겼습니다.');
+};
+document.getElementById('passwordBtn').onclick=()=>window.JournalCloud.setPassword();
+document.getElementById('logoutBtn').onclick=()=>window.JournalCloud.signOut();
+renderAll();
+window.JournalCloud.mountAuth({appName:'Investor Journal',onSession:async user=>{currentUser=user;await loadCloud();}});
+</script>
+</body>
+</html>

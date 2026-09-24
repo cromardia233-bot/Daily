@@ -1,4 +1,4 @@
-const CACHE = 'people-journal-v2';
+const CACHE = 'people-journal-v3';
 const ROOT_ASSETS = [
   './',
   './index.html',
