@@ -120,6 +120,7 @@ textarea.answer{width:100%;min-height:380px;resize:vertical;border:none;backgrou
 .home-section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:14px}
 .home-section h2{font-family:Georgia,"Batang",serif;font-size:23px;margin:0}
 .home-section p{margin:4px 0 0;color:#858078;font-size:13px}
+.happiness-card{margin:0 0 30px;border:1px solid #e2d8be;border-radius:18px;padding:22px;background:linear-gradient(135deg,#fffaf0,#f7f1df);display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:20px;align-items:center}.happiness-kicker{font-size:11px;letter-spacing:.11em;color:#8b7140}.happiness-title{font-family:Georgia,"Batang",serif;font-size:25px;margin:6px 0 7px}.happiness-copy{font-size:13px;line-height:1.7;color:#766b58;margin:0}.happiness-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.happiness-actions button{background:#54482f;color:#fff;border-color:#54482f}.happiness-summary{display:grid;grid-template-columns:1fr 1fr;gap:8px}.happy-mini{background:rgba(255,255,255,.74);border:1px solid #e7dcc2;border-radius:12px;padding:13px}.happy-mini span{display:block;font-size:10px;color:#948366;margin-bottom:6px}.happy-mini strong{font-family:Georgia,"Batang",serif;font-size:16px;color:#4e4535}.happiness-form{display:grid;grid-template-columns:1fr 1fr;gap:12px}.happiness-form .full{grid-column:1/-1}.score-wrap{display:flex;align-items:center;gap:12px}.score-wrap input{flex:1}.score-value{min-width:58px;text-align:center;font-family:Georgia,"Times New Roman",serif;font-size:22px}.happy-insights{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}.happy-list{display:grid;gap:9px}.happy-record{border:1px solid #e1ddd5;border-radius:13px;padding:15px;background:#fff}.happy-record-head{display:flex;justify-content:space-between;gap:12px;align-items:center}.happy-record-score{font-family:Georgia,"Times New Roman",serif;font-size:20px;color:#6e5a2c}.happy-record-body{font-size:13px;line-height:1.7;color:#615d57;margin-top:9px;white-space:pre-wrap}.happy-record-meta{font-size:11px;color:#918a7e;margin-top:8px}
 .part-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:9px}
 .part-card{border:1px solid #e1ddd5;border-radius:13px;padding:16px 12px;background:#fff;min-height:166px;display:flex;flex-direction:column;text-align:left;color:inherit;cursor:pointer;transition:.18s ease}
 .part-card:hover{transform:translateY(-2px);border-color:#aaa49a;background:#fdfbf7;box-shadow:0 8px 20px rgba(40,36,30,.06)}
@@ -209,9 +210,9 @@ textarea.answer{width:100%;min-height:380px;resize:vertical;border:none;backgrou
 @media(max-width:620px){.auth-card{padding:30px 22px}.auth-title{font-size:32px}.sync-bar{align-items:flex-start;flex-direction:column}.sync-actions{justify-content:flex-start}}
 
 @media(max-width:900px){
-  .home-top,.home-main{padding-left:24px;padding-right:24px}.home-title{font-size:38px}.today-card{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.part-grid{grid-template-columns:repeat(2,1fr)}.recent-item{grid-template-columns:92px 82px 1fr}.recent-arrow{display:none}
+  .home-top,.home-main{padding-left:24px;padding-right:24px}.home-title{font-size:38px}.today-card,.happiness-card{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.part-grid{grid-template-columns:repeat(2,1fr)}.recent-item{grid-template-columns:92px 82px 1fr}.recent-arrow{display:none}.happy-insights{grid-template-columns:1fr 1fr}
 }
-@media(max-width:560px){.home-top{flex-direction:column}.home-backup{width:100%}.stats{grid-template-columns:1fr 1fr}.recent-item{grid-template-columns:1fr}.recent-snippet{white-space:normal}.part-grid{grid-template-columns:1fr 1fr}.today-q{font-size:26px}}
+@media(max-width:560px){.home-top{flex-direction:column}.home-backup{width:100%}.stats{grid-template-columns:1fr 1fr}.recent-item{grid-template-columns:1fr}.recent-snippet{white-space:normal}.part-grid{grid-template-columns:1fr 1fr}.today-q{font-size:26px}.happiness-form{grid-template-columns:1fr}.happiness-form .full{grid-column:auto}.happy-insights{grid-template-columns:1fr 1fr}}
 @media print{.home-view{display:none!important}.journal-view{display:block!important}}
 @media (max-width:900px){
   body{padding:10px}
@@ -293,6 +294,11 @@ textarea.answer{width:100%;min-height:380px;resize:vertical;border:none;backgrou
           <button class="secondary-btn" id="continueBtn">최근 기록 열기</button>
         </aside>
       </div>
+
+      <section class="happiness-card">
+        <div><div class="happiness-kicker">HAPPINESS EXPLORER</div><h2 class="happiness-title">무엇이 나를 행복하게 하나요?</h2><p class="happiness-copy">좋았던 순간의 사람·활동·장소와 에너지 변화를 기록하면 나만의 행복 조건이 조금씩 보입니다.</p><div class="happiness-actions"><button id="openHappinessBtn">오늘의 행복 기록하기 →</button></div></div>
+        <div class="happiness-summary"><div class="happy-mini"><span>최근 평균</span><strong id="happyHomeAverage">—</strong></div><div class="happy-mini"><span>총 기록</span><strong id="happyHomeCount">0회</strong></div><div class="happy-mini"><span>행복 활동</span><strong id="happyHomeActivity">—</strong></div><div class="happy-mini"><span>함께한 사람</span><strong id="happyHomePeople">—</strong></div></div>
+      </section>
 
       <div class="stats">
         <div class="stat clickable" id="recordedDaysStat" role="button" tabindex="0" aria-label="기록한 날 달력 보기"><div class="stat-label">기록한 날</div><span class="stat-value" id="statDays">0</span><span class="stat-unit">일</span><span class="stat-hint">눌러서 달력 보기 →</span></div>
@@ -501,6 +507,29 @@ textarea.answer{width:100%;min-height:380px;resize:vertical;border:none;backgrou
       <button class="icon-btn" id="partListClose" aria-label="닫기">×</button>
     </header>
     <div class="calendar-body"><div class="part-record-list" id="partRecordList"></div></div>
+  </section>
+</div>
+
+<div class="modal-backdrop hidden" id="happinessBackdrop" role="dialog" aria-modal="true" aria-labelledby="happinessTitle">
+  <section class="calendar-modal">
+    <header class="calendar-head"><div class="calendar-title-wrap"><div class="calendar-title" id="happinessTitle">행복 탐색</div><div class="calendar-count">작은 행복의 조건을 모아봅니다.</div></div><button class="icon-btn" id="happinessClose" aria-label="닫기">×</button></header>
+    <div class="calendar-body">
+      <div class="happy-insights"><div class="happy-mini"><span>평균 행복</span><strong id="happyAverage">—</strong></div><div class="happy-mini"><span>자주 한 활동</span><strong id="happyActivity">—</strong></div><div class="happy-mini"><span>자주 함께한 사람</span><strong id="happyPeople">—</strong></div><div class="happy-mini"><span>행복 장소</span><strong id="happyPlace">—</strong></div></div>
+      <form id="happinessForm" class="happiness-form">
+        <div><label for="happinessDate">날짜</label><input id="happinessDate" type="date" required></div>
+        <div><label for="happinessScore">오늘의 행복 점수</label><div class="score-wrap"><input id="happinessScore" type="range" min="1" max="10" value="5"><span class="score-value" id="happinessScoreValue">5 / 10</span></div></div>
+        <div class="full"><label for="happinessMoment">오늘 가장 좋았던 순간</label><textarea id="happinessMoment" placeholder="아주 작은 순간이어도 괜찮아요."></textarea></div>
+        <div><label for="happinessPeople">누구와 있었나요?</label><input id="happinessPeople" type="text" placeholder="혼자, 가족, 친구…"></div>
+        <div><label for="happinessActivity">무엇을 하고 있었나요?</label><input id="happinessActivity" type="text" placeholder="산책, 대화, 휴식…"></div>
+        <div><label for="happinessPlace">어디에 있었나요?</label><input id="happinessPlace" type="text" placeholder="집, 공원, 카페…"></div>
+        <div><label for="happinessMeaning">왜 좋았다고 느꼈나요?</label><input id="happinessMeaning" type="text" placeholder="편안함, 연결감, 성취감…"></div>
+        <div><label for="happinessGiver">에너지를 준 것</label><textarea id="happinessGiver" placeholder="오늘 나를 채워준 것"></textarea></div>
+        <div><label for="happinessDrainer">에너지를 빼앗은 것</label><textarea id="happinessDrainer" placeholder="줄이거나 다르게 해보고 싶은 것"></textarea></div>
+        <div class="full"><label for="happinessTomorrow">내일 행복을 1점 높일 작은 행동</label><textarea id="happinessTomorrow" placeholder="10분 산책하기, 먼저 연락하기처럼 작게 적어보세요."></textarea></div>
+        <div class="full detail-actions"><button class="primary-btn" id="happinessSave" type="submit">행복 기록 저장</button><span class="save-status" id="happinessStatus"></span></div>
+      </form>
+      <div class="home-section"><div class="home-section-head"><div><h2>행복 기록</h2><p>점수보다 반복되는 조건을 살펴보세요.</p></div></div><div class="happy-list" id="happinessList"></div></div>
+    </div>
   </section>
 </div>
 
@@ -718,6 +747,7 @@ let currentUser = null;
 let saveChain = Promise.resolve();
 let activeSessionUserId = null;
 const entryCache = new Map();
+const happinessCache = new Map();
 const $ = id => document.getElementById(id);
 
 function isoDate(d){
@@ -804,6 +834,17 @@ function rowToEntry(row){
     part:row.part||''
   };
 }
+function happinessRow(dateStr,e){return {user_id:currentUser.id,entry_date:dateStr,score:Number(e.score)||5,moment:e.moment||'',people:e.people||'',activity:e.activity||'',place:e.place||'',meaning:e.meaning||'',energy_giver:e.energyGiver||'',energy_drainer:e.energyDrainer||'',tomorrow_action:e.tomorrowAction||'',updated_at:new Date().toISOString()};}
+function rowToHappiness(r){return {score:Number(r.score)||5,moment:r.moment||'',people:r.people||'',activity:r.activity||'',place:r.place||'',meaning:r.meaning||'',energyGiver:r.energy_giver||'',energyDrainer:r.energy_drainer||'',tomorrowAction:r.tomorrow_action||''};}
+function happinessEntries(){return [...happinessCache.entries()].map(([date,data])=>({date,data})).sort((a,b)=>b.date.localeCompare(a.date));}
+function topHappinessValue(entries,field){const counts=new Map(),labels=new Map();entries.forEach(x=>{const value=String(x.data[field]||'').trim();if(!value)return;const key=value.toLowerCase();counts.set(key,(counts.get(key)||0)+1);labels.set(key,value)});const top=[...counts.entries()].sort((a,b)=>b[1]-a[1])[0];return top?labels.get(top[0]):'—';}
+function renderHappinessSummary(){const entries=happinessEntries(),avg=entries.length?(entries.reduce((s,x)=>s+Number(x.data.score||0),0)/entries.length).toFixed(1):'—';$('happyHomeAverage').textContent=avg==='—'?'—':avg+' / 10';$('happyHomeCount').textContent=entries.length+'회';$('happyHomeActivity').textContent=topHappinessValue(entries,'activity');$('happyHomePeople').textContent=topHappinessValue(entries,'people');$('happyAverage').textContent=avg==='—'?'—':avg+' / 10';$('happyActivity').textContent=topHappinessValue(entries,'activity');$('happyPeople').textContent=topHappinessValue(entries,'people');$('happyPlace').textContent=topHappinessValue(entries,'place');}
+function fillHappinessForm(dateStr){const e=happinessCache.get(dateStr)||{};$('happinessDate').value=dateStr;$('happinessScore').value=Number(e.score)||5;$('happinessScoreValue').textContent=`${$('happinessScore').value} / 10`;$('happinessMoment').value=e.moment||'';$('happinessPeople').value=e.people||'';$('happinessActivity').value=e.activity||'';$('happinessPlace').value=e.place||'';$('happinessMeaning').value=e.meaning||'';$('happinessGiver').value=e.energyGiver||'';$('happinessDrainer').value=e.energyDrainer||'';$('happinessTomorrow').value=e.tomorrowAction||'';$('happinessStatus').textContent=happinessCache.has(dateStr)?'이 날짜의 기록을 불러왔습니다.':'';}
+function renderHappinessList(){const entries=happinessEntries();$('happinessList').innerHTML=entries.length?entries.map(x=>{const d=dateFromIso(x.date),e=x.data,meta=[e.people,e.activity,e.place].filter(Boolean).map(escapeHTML).join(' · ');return `<article class="happy-record"><div class="happy-record-head"><div><span class="recent-date">${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}</span><span class="happy-record-score"> ${e.score}/10</span></div><div class="recent-actions"><button class="mini-btn" data-happy-edit="${x.date}">수정</button><button class="mini-btn danger" data-happy-delete="${x.date}">삭제</button></div></div><div class="happy-record-body">${escapeHTML(e.moment||e.meaning||'짧은 행복 기록')}</div>${meta?`<div class="happy-record-meta">${meta}</div>`:''}</article>`}).join(''):'<div class="empty-state">아직 행복 기록이 없습니다. 오늘 좋았던 작은 순간부터 시작해보세요.</div>';}
+function openHappiness(dateStr=isoDate(new Date())){fillHappinessForm(dateStr);renderHappinessSummary();renderHappinessList();$('happinessBackdrop').classList.remove('hidden');document.body.style.overflow='hidden';}
+function closeHappiness(){$('happinessBackdrop').classList.add('hidden');document.body.style.overflow='';}
+async function saveHappiness(){if(!currentUser)return;const dateStr=$('happinessDate').value||isoDate(new Date()),e={score:Number($('happinessScore').value)||5,moment:$('happinessMoment').value.trim(),people:$('happinessPeople').value.trim(),activity:$('happinessActivity').value.trim(),place:$('happinessPlace').value.trim(),meaning:$('happinessMeaning').value.trim(),energyGiver:$('happinessGiver').value.trim(),energyDrainer:$('happinessDrainer').value.trim(),tomorrowAction:$('happinessTomorrow').value.trim()};if(!e.moment&&!e.people&&!e.activity&&!e.place&&!e.meaning&&!e.energyGiver&&!e.energyDrainer&&!e.tomorrowAction){$('happinessStatus').textContent='한 칸 이상 기록해주세요.';return}$('happinessSave').disabled=true;$('happinessStatus').textContent='저장 중…';const {error}=await supabaseClient.from('happiness_entries').upsert(happinessRow(dateStr,e),{onConflict:'user_id,entry_date'});$('happinessSave').disabled=false;if(error){console.error(error);$('happinessStatus').textContent='저장하지 못했습니다. 잠시 후 다시 시도해주세요.';return}happinessCache.set(dateStr,e);$('happinessStatus').textContent='저장되었습니다.';renderHappinessSummary();renderHappinessList();renderHome();}
+async function deleteHappiness(dateStr){if(!confirm('이 행복 기록을 삭제할까요?'))return;const {error}=await supabaseClient.from('happiness_entries').delete().eq('user_id',currentUser.id).eq('entry_date',dateStr);if(error){alert(error.message);return}happinessCache.delete(dateStr);fillHappinessForm(isoDate(new Date()));renderHappinessSummary();renderHappinessList();renderHome();}
 function setSyncStatus(message, isError=false){
   $('syncState').textContent=message;
   $('syncState').style.color=isError?'#9b453e':'';
@@ -875,9 +916,11 @@ function exportMarkdown(){
   download(`me-time-${isoDate(currentDate)}.md`,md,'text/markdown');
 }
 function exportJson(){
-  const all={};
-  allSavedEntries().slice().reverse().forEach(x=>{all[x.date]=x.data;});
-  download(`me-time-journal-backup-${isoDate(new Date())}.json`,JSON.stringify(all,null,2),'application/json');
+  const journal={},happiness={};
+  allSavedEntries().slice().reverse().forEach(x=>{journal[x.date]=x.data;});
+  happinessEntries().slice().reverse().forEach(x=>{happiness[x.date]=x.data;});
+  const backup={app:'Me Time Journal',version:2,exportedAt:new Date().toISOString(),journal,happiness};
+  download(`me-time-journal-backup-${isoDate(new Date())}.json`,JSON.stringify(backup,null,2),'application/json');
 }
 
 function localEntriesForMigration(){
@@ -945,9 +988,11 @@ async function loadEntries(){
   }
   setSyncStatus('Supabase에 동기화됨');
 }
+async function loadHappinessEntries(){happinessCache.clear();const {data,error}=await supabaseClient.from('happiness_entries').select('*').eq('user_id',currentUser.id).order('entry_date',{ascending:true});if(error)throw error;(data||[]).forEach(r=>happinessCache.set(r.entry_date,rowToHappiness(r)));}
 function showAuth(message=''){
   stopTimer();
   closeCalendar();
+  closeHappiness();
   $('homeView').classList.add('hidden');
   $('journalView').classList.add('hidden');
   $('authView').classList.remove('hidden');
@@ -959,6 +1004,7 @@ async function handleSession(session){
     currentUser=null;
     activeSessionUserId=null;
     entryCache.clear();
+    happinessCache.clear();
     showAuth();
     return;
   }
@@ -970,7 +1016,7 @@ async function handleSession(session){
   $('homeView').classList.remove('hidden');
   $('journalView').classList.add('hidden');
   try{
-    await loadEntries();
+    await Promise.all([loadEntries(),loadHappinessEntries()]);
     updateMigrationButton();
     if(location.hash==='#journal') showJournal(currentDate); else showHome();
   }catch(error){
@@ -1112,6 +1158,7 @@ function renderCalendarDetail(entry){
 }
 
 function renderHome(){
+  renderHappinessSummary();
   const today=new Date();
   const t=promptFor(today);
   $('homeTodayDate').textContent=today.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
@@ -1267,6 +1314,18 @@ $('passwordForm').addEventListener('submit',async e=>{
 $('homeBtn').onclick=()=>{saveEntry(false);showHome();};
 $('startToday').onclick=()=>showJournal(new Date());
 $('homeExportJson').onclick=exportJson;
+$('openHappinessBtn').onclick=()=>openHappiness();
+$('happinessClose').onclick=closeHappiness;
+$('happinessBackdrop').addEventListener('click',e=>{if(e.target===$('happinessBackdrop'))closeHappiness();});
+$('happinessScore').oninput=e=>{$('happinessScoreValue').textContent=`${e.target.value} / 10`;};
+$('happinessDate').onchange=e=>fillHappinessForm(e.target.value);
+$('happinessForm').addEventListener('submit',e=>{e.preventDefault();saveHappiness();});
+$('happinessList').addEventListener('click',e=>{
+  const edit=e.target.closest('[data-happy-edit]');
+  if(edit){fillHappinessForm(edit.dataset.happyEdit);$('happinessForm').scrollIntoView({behavior:'smooth',block:'start'});return;}
+  const del=e.target.closest('[data-happy-delete]');
+  if(del)deleteHappiness(del.dataset.happyDelete);
+});
 $('continueBtn').onclick=()=>{const d=$('continueBtn').dataset.date;if(d)showJournal(dateFromIso(d));};
 $('homePartGrid').addEventListener('click',e=>{const card=e.target.closest('[data-part-index]');if(card)openPartRecords(Number(card.dataset.partIndex));});
 $('partListClose').onclick=closePartRecords;
@@ -1294,6 +1353,7 @@ $('deleteCurrent').onclick=()=>removeEntry(isoDate(currentDate));
 document.addEventListener('keydown',e=>{
   if(e.key!=='Escape') return;
   if(!$('passwordBackdrop').classList.contains('hidden')) $('passwordClose').click();
+  else if(!$('happinessBackdrop').classList.contains('hidden')) closeHappiness();
   else if(!$('partBackdrop').classList.contains('hidden')) closePartRecords();
   else if(!$('calendarBackdrop').classList.contains('hidden')) closeCalendar();
 });
