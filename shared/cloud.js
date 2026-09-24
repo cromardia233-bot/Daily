@@ -1,7 +1,7 @@
 (() => {
   const SUPABASE_URL = 'https://fgrwdqdfafikmxvrhbmd.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_4-E4mPBMxXceDC-m5IOh8w_ZtZKLkgq';
-  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}});
 
   function injectStyles(){
     if(document.getElementById('journalCloudStyles')) return;
@@ -45,7 +45,8 @@
       if(!email.value.trim()){setMessage('이메일을 먼저 입력해주세요.',true);return;}
       setMessage('이메일을 보내는 중…');
       const {error}=await client.auth.signInWithOtp({email:email.value.trim(),options:{emailRedirectTo:location.href.split('#')[0],shouldCreateUser:true}});
-      setMessage(error?error.message:'이메일로 로그인 링크를 보냈습니다.',!!error);
+      const rateLimited=error&&(error.status===429||/rate limit/i.test(error.message||''));
+      setMessage(error?(rateLimited?'이메일 발송 한도를 넘었습니다. 마지막으로 받은 링크를 사용하거나 약 1시간 뒤 다시 시도해주세요.':error.message):'이메일로 로그인 링크를 보냈습니다.',!!error);
     };
     password.addEventListener('keydown',e=>{if(e.key==='Enter')gate.querySelector('[data-cloud-login]').click()});
     let activeId='';

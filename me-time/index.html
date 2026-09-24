@@ -494,7 +494,7 @@ textarea.answer{width:100%;min-height:380px;resize:vertical;border:none;backgrou
 <script>
 const SUPABASE_URL = 'https://fgrwdqdfafikmxvrhbmd.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_4-E4mPBMxXceDC-m5IOh8w_ZtZKLkgq';
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}});
 const JOURNAL = [
   {
     name:'나', label:'Part One - 나',
@@ -1190,7 +1190,7 @@ $('sendLinkBtn').onclick=async()=>{
   $('sendLinkBtn').disabled=false;
   if(error){
     console.error(error);
-    $('authStatus').textContent='본인 확인 링크를 보내지 못했습니다. 이메일 주소를 확인한 뒤 다시 시도해주세요.';
+    $('authStatus').textContent=(error.status===429||/rate limit/i.test(error.message||''))?'이메일 발송 한도를 넘었습니다. 마지막으로 받은 링크를 사용하거나 약 1시간 뒤 다시 시도해주세요.':'본인 확인 링크를 보내지 못했습니다. 이메일 주소를 확인한 뒤 다시 시도해주세요.';
     return;
   }
   $('authStatus').textContent='이메일을 보냈습니다. 링크를 눌러 로그인한 뒤 홈에서 비밀번호를 설정해주세요.';
