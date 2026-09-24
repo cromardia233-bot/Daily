@@ -189,6 +189,7 @@ textarea.answer{width:100%;min-height:380px;resize:vertical;border:none;backgrou
 .auth-form input:focus{border-color:#89847b}
 .auth-submit{border:0;background:#303631;color:#fff;border-radius:12px;padding:13px 16px;font-weight:700}
 .auth-submit:disabled{opacity:.55;cursor:wait}
+.auth-secondary{border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px 14px;color:#55514c}
 .auth-status{min-height:22px;margin-top:13px;font-size:13px;line-height:1.6;color:#5f6b60}
 .auth-note{margin-top:20px;padding-top:18px;border-top:1px solid #eee9e1;font-size:12px;line-height:1.7;color:#8a857d}
 .sync-bar{display:flex;align-items:center;justify-content:space-between;gap:18px;border:1px solid #ded9d0;background:#f8f5ef;border-radius:14px;padding:13px 16px;margin-bottom:18px}
@@ -197,6 +198,10 @@ textarea.answer{width:100%;min-height:380px;resize:vertical;border:none;backgrou
 .sync-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .sync-actions button{padding:7px 11px;font-size:11px;background:#fff}
 .sync-state{font-size:11px;color:#657066}
+.password-modal{width:min(500px,100%);background:var(--paper);border:1px solid #e3ded5;border-radius:22px;box-shadow:0 28px 90px rgba(20,18,15,.22);padding:28px}
+.password-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:20px}
+.password-title{font-family:Georgia,"Batang",serif;font-size:25px;margin:0 0 6px}
+.password-copy{font-size:13px;line-height:1.65;color:#746f67;margin:0}
 @media(max-width:620px){.auth-card{padding:30px 22px}.auth-title{font-size:32px}.sync-bar{align-items:flex-start;flex-direction:column}.sync-actions{justify-content:flex-start}}
 
 @media(max-width:900px){
@@ -227,14 +232,17 @@ textarea.answer{width:100%;min-height:380px;resize:vertical;border:none;backgrou
   <div class="auth-card">
     <div class="auth-brand">Me Time Journal</div>
     <h1 class="auth-title">나만의 기록으로 들어가기</h1>
-    <p class="auth-copy">이메일로 받은 로그인 링크를 누르면 비밀번호 없이 안전하게 시작할 수 있습니다. 같은 이메일로 로그인하면 아이폰과 컴퓨터에서 같은 기록이 열립니다.</p>
+    <p class="auth-copy">이메일과 비밀번호로 로그인하세요. 같은 계정으로 로그인하면 아이폰과 컴퓨터에서 같은 기록이 열립니다.</p>
     <form class="auth-form" id="authForm">
       <label for="authEmail">이메일</label>
       <input id="authEmail" type="email" autocomplete="email" inputmode="email" placeholder="name@example.com" required />
-      <button class="auth-submit" id="authSubmit" type="submit">로그인 링크 받기</button>
+      <label for="authPassword">비밀번호</label>
+      <input id="authPassword" type="password" autocomplete="current-password" minlength="8" placeholder="8자 이상" required />
+      <button class="auth-submit" id="authSubmit" type="submit">로그인</button>
+      <button class="auth-secondary" id="sendLinkBtn" type="button">처음 설정 / 비밀번호를 잊었을 때</button>
     </form>
     <div class="auth-status" id="authStatus" role="status"></div>
-    <div class="auth-note">비밀번호는 저장하지 않습니다. 로그인 링크를 요청한 뒤 받은 이메일에서 링크를 눌러주세요.</div>
+    <div class="auth-note">처음 한 번은 이메일 링크로 본인 확인 후 비밀번호를 설정합니다. 비밀번호는 이 페이지나 GitHub 코드에 저장되지 않습니다.</div>
   </div>
 </section>
 
@@ -254,6 +262,7 @@ textarea.answer{width:100%;min-height:380px;resize:vertical;border:none;backgrou
         <div class="sync-copy"><strong id="userEmail">클라우드 동기화</strong><span id="syncState" class="sync-state">Supabase에 안전하게 저장됩니다.</span></div>
         <div class="sync-actions">
           <button id="migrateBtn" class="hidden">기존 기록 옮기기</button>
+          <button id="passwordBtn">비밀번호 설정</button>
           <button id="logoutBtn">로그아웃</button>
         </div>
       </div>
@@ -432,6 +441,27 @@ textarea.answer{width:100%;min-height:380px;resize:vertical;border:none;backgrou
       <span id="saveStatus" class="save-status">저장 준비됨</span>
     </div>
   </main>
+</div>
+
+
+<div class="modal-backdrop hidden" id="passwordBackdrop" role="dialog" aria-modal="true" aria-labelledby="passwordTitle">
+  <section class="password-modal">
+    <div class="password-head">
+      <div>
+        <h2 class="password-title" id="passwordTitle">비밀번호 설정</h2>
+        <p class="password-copy">앞으로 이메일 링크 대신 사용할 비밀번호를 정해주세요.</p>
+      </div>
+      <button class="icon-btn" id="passwordClose" type="button" aria-label="닫기">×</button>
+    </div>
+    <form class="auth-form" id="passwordForm">
+      <label for="newPassword">새 비밀번호</label>
+      <input id="newPassword" type="password" autocomplete="new-password" minlength="8" placeholder="8자 이상" required />
+      <label for="confirmPassword">새 비밀번호 확인</label>
+      <input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" placeholder="같은 비밀번호를 다시 입력" required />
+      <button class="auth-submit" id="passwordSave" type="submit">비밀번호 저장</button>
+    </form>
+    <div class="auth-status" id="passwordStatus" role="status"></div>
+  </section>
 </div>
 
 
@@ -1134,21 +1164,36 @@ $('authForm').addEventListener('submit',async e=>{
   e.preventDefault();
   if(SUPABASE_ANON_KEY==='__SUPABASE_ANON_KEY__') return;
   const email=$('authEmail').value.trim();
-  if(!email) return;
+  const password=$('authPassword').value;
+  if(!email||password.length<8) return;
   $('authSubmit').disabled=true;
-  $('authStatus').textContent='로그인 링크를 보내는 중…';
-  const redirectTo=location.origin+location.pathname;
-  const {error}=await supabaseClient.auth.signInWithOtp({email,options:{emailRedirectTo:redirectTo,shouldCreateUser:true}});
+  $('authStatus').textContent='로그인 중…';
+  const {error}=await supabaseClient.auth.signInWithPassword({email,password});
+  $('authSubmit').disabled=false;
   if(error){
     console.error(error);
-    $('authStatus').textContent='로그인 링크를 보내지 못했습니다. 이메일 주소를 확인한 뒤 다시 시도해주세요.';
-    $('authSubmit').disabled=false;
+    $('authStatus').textContent='이메일 또는 비밀번호가 맞지 않습니다. 처음이라면 아래 버튼으로 비밀번호를 설정해주세요.';
     return;
   }
-  $('authStatus').textContent='이메일을 보냈습니다. 받은 편지함에서 로그인 링크를 눌러주세요.';
-  $('authSubmit').textContent='링크 다시 받기';
-  $('authSubmit').disabled=false;
+  $('authPassword').value='';
+  $('authStatus').textContent='로그인되었습니다.';
 });
+$('sendLinkBtn').onclick=async()=>{
+  const email=$('authEmail').value.trim();
+  if(!email){$('authStatus').textContent='먼저 이메일을 입력해주세요.';return;}
+  $('sendLinkBtn').disabled=true;
+  $('authStatus').textContent='본인 확인 링크를 보내는 중…';
+  const redirectTo=location.origin+location.pathname;
+  const {error}=await supabaseClient.auth.signInWithOtp({email,options:{emailRedirectTo:redirectTo,shouldCreateUser:true}});
+  $('sendLinkBtn').disabled=false;
+  if(error){
+    console.error(error);
+    $('authStatus').textContent='본인 확인 링크를 보내지 못했습니다. 이메일 주소를 확인한 뒤 다시 시도해주세요.';
+    return;
+  }
+  $('authStatus').textContent='이메일을 보냈습니다. 링크를 눌러 로그인한 뒤 홈에서 비밀번호를 설정해주세요.';
+  $('sendLinkBtn').textContent='본인 확인 링크 다시 받기';
+};
 $('logoutBtn').onclick=async()=>{
   $('logoutBtn').disabled=true;
   await saveChain.catch(()=>{});
@@ -1157,6 +1202,33 @@ $('logoutBtn').onclick=async()=>{
   if(error){console.error(error);setSyncStatus('로그아웃하지 못했습니다.',true);}
 };
 $('migrateBtn').onclick=migrateLocalEntries;
+$('passwordBtn').onclick=()=>{
+  $('newPassword').value='';
+  $('confirmPassword').value='';
+  $('passwordStatus').textContent='';
+  $('passwordBackdrop').classList.remove('hidden');
+  document.body.style.overflow='hidden';
+  $('newPassword').focus();
+};
+$('passwordClose').onclick=()=>{
+  $('passwordBackdrop').classList.add('hidden');
+  document.body.style.overflow='';
+};
+$('passwordBackdrop').addEventListener('click',e=>{if(e.target===$('passwordBackdrop'))$('passwordClose').click();});
+$('passwordForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const password=$('newPassword').value;
+  if(password.length<8){$('passwordStatus').textContent='비밀번호는 8자 이상으로 입력해주세요.';return;}
+  if(password!==$('confirmPassword').value){$('passwordStatus').textContent='두 비밀번호가 서로 다릅니다.';return;}
+  $('passwordSave').disabled=true;
+  $('passwordStatus').textContent='비밀번호를 저장하는 중…';
+  const {error}=await supabaseClient.auth.updateUser({password});
+  $('passwordSave').disabled=false;
+  if(error){console.error(error);$('passwordStatus').textContent='비밀번호를 저장하지 못했습니다. 다시 시도해주세요.';return;}
+  $('passwordStatus').textContent='비밀번호가 저장되었습니다. 다음부터 이메일과 비밀번호로 로그인할 수 있습니다.';
+  $('passwordBtn').textContent='비밀번호 변경';
+  setTimeout(()=>$('passwordClose').click(),1100);
+});
 
 $('homeBtn').onclick=()=>{saveEntry(false);showHome();};
 $('startToday').onclick=()=>showJournal(new Date());
@@ -1180,7 +1252,11 @@ $('recordDetail').addEventListener('click',e=>{
   const del=e.target.closest('[data-calendar-delete]'); if(del){removeEntry(del.dataset.calendarDelete);return;}
 });
 $('deleteCurrent').onclick=()=>removeEntry(isoDate(currentDate));
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('calendarBackdrop').classList.contains('hidden'))closeCalendar();});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape') return;
+  if(!$('passwordBackdrop').classList.contains('hidden')) $('passwordClose').click();
+  else if(!$('calendarBackdrop').classList.contains('hidden')) closeCalendar();
+});
 
 $('prevDay').onclick=()=>changeDay(-1); $('nextDay').onclick=()=>changeDay(1);
 $('todayBtn').onclick=()=>{saveEntry(false);currentDate=new Date();updatePage();};
