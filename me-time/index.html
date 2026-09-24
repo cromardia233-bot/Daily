@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Me Time Daily Journal</title>
+<style>
+:root{
+  --bg:#f6f3ed;
+  --paper:#fffdf9;
+  --ink:#1d1d1b;
+  --muted:#75736f;
+  --line:#d8d4cd;
+  --soft:#efebe4;
+  --accent:#2f3630;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Noto Sans KR","Malgun Gothic",sans-serif;}
+body{min-height:100vh;padding:24px}
+button,input,textarea{font:inherit}
+.wrap{max-width:1180px;margin:0 auto}
+.toolbar{display:flex;gap:10px;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.toolbar .left,.toolbar .right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button,.date-input{border:1px solid var(--line);background:var(--paper);padding:9px 12px;border-radius:999px;color:var(--ink)}
+button{cursor:pointer;transition:.18s ease}
+button:hover{transform:translateY(-1px);border-color:#aaa49a}
+.paper{background:var(--paper);border:1px solid #e8e3db;box-shadow:0 18px 60px rgba(38,34,28,.08);border-radius:18px;overflow:hidden}
+.progress{height:24px;padding:0 26px;display:flex;align-items:center;gap:0}
+.progress .bar{height:4px;background:#ece8e1;flex:1;position:relative}
+.progress .bar:before{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--pct);background:#414740;border-radius:999px}
+.dots{display:flex;gap:22px;margin-left:10px}
+.dot{width:7px;height:7px;border-radius:50%;background:#dedbd4}
+.dot.active{background:#414740;outline:3px solid #cfd2cc}
+.grid{display:grid;grid-template-columns:1fr 1.08fr;min-height:760px}
+.left-page,.right-page{padding:48px 62px 54px}
+.left-page{border-right:1px solid #ece8e0;position:relative}
+.part-label{position:absolute;left:14px;top:50%;transform:rotate(-90deg) translateY(-50%);transform-origin:left top;font-family:Georgia,"Times New Roman",serif;font-size:15px;letter-spacing:.02em;color:#3f3e3b}
+.kicker{font-family:Georgia,"Times New Roman",serif;font-size:14px;color:var(--muted);margin-bottom:8px}
+.counter{font-family:Georgia,"Times New Roman",serif;font-size:18px;float:right;color:#4a4946}
+.title{font-family:Georgia,"Batang","Times New Roman",serif;font-size:44px;line-height:1.22;margin:18px 0 28px;letter-spacing:-.035em;font-weight:700}
+.intro{font-family:Georgia,"Batang","Times New Roman",serif;font-size:17px;line-height:1.9;color:#45433f;margin:0 0 34px;max-width:480px}
+.guide{margin-top:24px;padding-top:8px}
+.guide h3{font-size:19px;margin:0 0 10px;font-family:Georgia,"Batang",serif}
+.guide ul{padding:0;margin:0;list-style:none}
+.guide li{font-family:Georgia,"Batang",serif;font-size:16px;line-height:1.8;margin:1px 0;color:#4a4844}
+.guide li:before{content:"– ";color:#7f7c76}
+.quote{margin-top:54px;border-top:1px solid var(--line);padding-top:22px;text-align:center;font-family:Georgia,"Batang",serif;color:#5b5954}
+.quote .mark{font-size:30px;line-height:1;margin-bottom:4px}
+.quote .small{font-size:13px;color:#86827b;margin-top:5px}
+.right-page{position:relative}
+.date-row{display:flex;justify-content:flex-end;align-items:center;gap:8px;font-family:Georgia,"Batang",serif;font-size:14px;color:#52504c}
+.date-line{width:140px;border-bottom:1px solid #bcb7ae;padding:2px 4px 5px;text-align:center}
+.question{font-family:Georgia,"Batang",serif;font-size:18px;font-weight:700;margin:12px 0 14px}
+textarea.answer{width:100%;min-height:380px;resize:vertical;border:none;background:repeating-linear-gradient(to bottom,transparent 0,transparent 38px,#d8d4cd 39px,#d8d4cd 40px);line-height:40px;font-size:17px;padding:0 4px;outline:none;color:#272622;font-family:Georgia,"Batang",serif}
+.time-row{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:12px;font-family:Georgia,"Batang",serif;color:#4b4945}
+.timer{font-variant-numeric:tabular-nums;min-width:64px;text-align:center;border-bottom:1px solid #aaa59b;padding:4px 6px}
+.timer-btn{padding:6px 10px;border-radius:10px;font-size:12px}
+.section-label{font-family:Georgia,"Batang",serif;font-weight:700;margin:34px 0 12px}
+.words{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.words input{border:none;background:var(--soft);border-radius:9px;padding:13px 12px;text-align:center;outline:none}
+.emotions{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid #bbb6ad;background:#fff;border-radius:999px;padding:7px 14px;font-size:14px;cursor:pointer;user-select:none}
+.chip.active{background:#373d38;color:#fff;border-color:#373d38}
+.emotion-practice{margin-top:20px;border:1px solid #ded9d0;background:#f8f5ef;border-radius:16px;padding:20px}
+.emotion-practice-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:16px}
+.emotion-practice-title{font-family:Georgia,"Batang",serif;font-size:19px;font-weight:700;margin:0 0 5px}
+.emotion-practice-copy{font-size:13px;line-height:1.7;color:#706b64;margin:0;max-width:620px}
+.emotion-steps{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.emotion-step{background:#fff;border:1px solid #e2ddd5;border-radius:13px;padding:15px}
+.emotion-step-head{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.step-no{width:25px;height:25px;border-radius:50%;background:#3d443e;color:#fff;display:grid;place-items:center;font-family:Georgia,"Times New Roman",serif;font-size:12px;flex:0 0 auto}
+.emotion-step h4{font-family:Georgia,"Batang",serif;font-size:15px;margin:0}
+.step-help{font-size:12px;line-height:1.55;color:#888279;margin:0 0 10px}
+.emotion-field{width:100%;border:1px solid #e0dbd2;background:#fbfaf7;border-radius:9px;padding:10px 11px;outline:none;resize:vertical;min-height:64px;line-height:1.6;color:#33312e}
+.emotion-field:focus{border-color:#aaa49a;background:#fff}
+.intensity-row{display:grid;grid-template-columns:auto 1fr 42px;gap:10px;align-items:center;margin-top:12px;font-size:12px;color:#716c65}
+.intensity-row input[type=range]{width:100%;accent-color:#414740}
+.intensity-value{font-family:Georgia,"Times New Roman",serif;text-align:center;border:1px solid #ddd8cf;border-radius:999px;padding:4px 6px;background:#fff;color:#333}
+.acceptance-cue{margin-top:12px;padding:11px 12px;border-left:3px solid #7d877e;background:#f3f1eb;border-radius:0 9px 9px 0;font-family:Georgia,"Batang",serif;font-size:13px;line-height:1.65;color:#595650}
+.emotion-tip{margin-top:13px;font-size:11px;line-height:1.65;color:#8a857d}
+@media(max-width:700px){.emotion-steps{grid-template-columns:1fr}.emotion-practice{padding:16px}.emotion-practice-head{display:block}}
+.note-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:28px}
+.note-card{border:1px solid #e0dcd4;background:#faf8f3;border-radius:12px;padding:14px}
+.note-card label{display:block;font-size:14px;font-weight:700;margin-bottom:8px}
+.note-card textarea{width:100%;min-height:86px;border:none;background:transparent;resize:vertical;outline:none;line-height:1.7}
+.footer{padding:14px 24px 18px;border-top:1px solid #eee9e1;color:#85817a;font-size:12px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.save-status{color:#5f6b60}
+
+.hidden{display:none!important}
+.home-view{max-width:1180px;margin:0 auto}
+.home-shell{background:var(--paper);border:1px solid #e8e3db;box-shadow:0 18px 60px rgba(38,34,28,.08);border-radius:22px;overflow:hidden}
+.home-top{padding:34px 44px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:24px;border-bottom:1px solid #eee9e1}
+.home-brand{font-family:Georgia,"Times New Roman",serif;font-size:14px;letter-spacing:.18em;color:#77736d;text-transform:uppercase}
+.home-title{font-family:Georgia,"Batang","Times New Roman",serif;font-size:46px;letter-spacing:-.04em;margin:8px 0 8px;line-height:1.15}
+.home-sub{font-family:Georgia,"Batang",serif;color:#69655f;line-height:1.8;margin:0}
+.home-backup{white-space:nowrap}
+.home-main{padding:30px 44px 46px}
+.today-card{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(260px,.75fr);gap:18px;margin-bottom:22px}
+.today-primary{background:#303631;color:#fff;border-radius:18px;padding:32px 34px;min-height:275px;display:flex;flex-direction:column;justify-content:space-between}
+.today-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;color:#d8ddd8}
+.part-pill{display:inline-flex;border:1px solid rgba(255,255,255,.22);padding:6px 10px;border-radius:999px}
+.today-q{font-family:Georgia,"Batang",serif;font-size:31px;line-height:1.45;letter-spacing:-.025em;margin:24px 0 28px;max-width:760px}
+.primary-btn{align-self:flex-start;border:none;background:#fff;color:#242824;border-radius:999px;padding:12px 18px;font-weight:700}
+.primary-btn:hover{border:none;transform:translateY(-1px)}
+.today-side{border:1px solid #e3dfd8;border-radius:18px;padding:24px;background:#faf8f3;display:flex;flex-direction:column;justify-content:space-between}
+.side-label{font-size:12px;letter-spacing:.12em;color:#858078;text-transform:uppercase}
+.side-title{font-family:Georgia,"Batang",serif;font-size:24px;line-height:1.45;margin:10px 0 8px}
+.side-copy{font-size:14px;line-height:1.7;color:#716d66;margin:0}
+.secondary-btn{margin-top:22px;width:100%;border-radius:12px;background:transparent}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 0 30px}
+.stat{border:1px solid #e2ddd5;border-radius:14px;padding:18px 18px;background:#fff}
+.stat.clickable{cursor:pointer;transition:.18s ease;position:relative}
+.stat.clickable:hover{transform:translateY(-1px);border-color:#aaa49a;background:#fdfbf7}
+.stat.clickable:focus-visible{outline:2px solid #59625a;outline-offset:2px}
+.stat-hint{display:block;margin-top:9px;font-size:10px;color:#99948c}
+.stat-label{font-size:12px;color:#8a857d;margin-bottom:10px}
+.stat-value{font-family:Georgia,"Times New Roman",serif;font-size:28px;line-height:1}
+.stat-unit{font-size:12px;color:#88837c;margin-left:3px}
+.home-section{margin-top:30px}
+.home-section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:14px}
+.home-section h2{font-family:Georgia,"Batang",serif;font-size:23px;margin:0}
+.home-section p{margin:4px 0 0;color:#858078;font-size:13px}
+.part-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:9px}
+.part-card{border:1px solid #e1ddd5;border-radius:13px;padding:16px 12px;background:#fff;min-height:166px;display:flex;flex-direction:column}
+.part-no{font-family:Georgia,"Times New Roman",serif;font-size:12px;color:#9a958d}
+.part-name{font-family:Georgia,"Batang",serif;font-weight:700;font-size:16px;margin-top:12px}
+.part-stats{margin-top:auto;padding-top:18px}
+.part-stat-row{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:#77726b;margin-bottom:9px}
+.part-stat-row strong{font-size:12px;color:#35332f;font-weight:700}
+.part-progress{height:5px;background:#ece8e1;border-radius:999px;overflow:hidden}
+.part-progress>span{display:block;height:100%;background:#414740;border-radius:999px}
+.part-rate{margin-top:7px;font-size:10px;color:#98938b;text-align:right}
+.recent-list{display:grid;gap:9px}
+.recent-item{width:100%;display:grid;grid-template-columns:112px 110px minmax(0,1fr) auto;align-items:center;gap:14px;border:1px solid #e1ddd5;border-radius:12px;background:#fff;padding:14px 16px;text-align:left}
+.recent-item:hover{border-color:#aaa49a;background:#fdfbf7}
+.recent-actions{display:flex;gap:6px;justify-content:flex-end;white-space:nowrap}
+.mini-btn{padding:6px 10px;border-radius:999px;font-size:11px;background:#fff}
+.mini-btn.danger{color:#8b3b35;border-color:#d7b7b2}
+.mini-btn.danger:hover{border-color:#b98179}
+.recent-date{font-family:Georgia,"Times New Roman",serif;font-size:14px}
+.recent-part{font-size:13px;color:#69655f}
+.recent-snippet{font-size:14px;color:#55514c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.recent-arrow{color:#99948c}
+.empty-state{border:1px dashed #d5d0c7;border-radius:14px;padding:24px;color:#807b73;text-align:center;background:#fbfaf7}
+.home-foot{border-top:1px solid #eee9e1;padding:16px 44px;color:#8c877f;font-size:12px;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+
+/* 기록 달력 */
+.modal-backdrop{position:fixed;inset:0;background:rgba(28,28,26,.46);display:flex;align-items:center;justify-content:center;padding:20px;z-index:1000}
+.calendar-modal{width:min(760px,100%);max-height:90vh;overflow:auto;background:var(--paper);border:1px solid #e3ded5;border-radius:22px;box-shadow:0 28px 90px rgba(20,18,15,.22)}
+.calendar-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 24px 16px;border-bottom:1px solid #eee9e1}
+.calendar-title-wrap{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.calendar-title{font-family:Georgia,"Batang",serif;font-size:26px;font-weight:700}
+.calendar-count{font-size:12px;color:#817c74}
+.calendar-nav{display:flex;align-items:center;gap:7px}
+.icon-btn{width:38px;height:38px;padding:0;border-radius:50%;display:grid;place-items:center}
+.calendar-body{padding:18px 24px 24px}
+.weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.weekday{font-size:11px;color:#8c877f;text-align:center;padding:5px 0 8px}
+.cal-day{aspect-ratio:1/1;border:1px solid transparent;background:transparent;border-radius:14px;padding:0;display:grid;place-items:center;position:relative;min-width:0}
+.cal-day.empty{pointer-events:none}
+.cal-day:not(.empty):hover{background:#f5f1ea}
+.cal-day .day-num{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;font-family:Georgia,"Times New Roman",serif;font-size:15px}
+.cal-day.recorded{cursor:pointer}
+.cal-day.recorded .day-num{border:2px solid #3f4740;font-weight:700;background:#fff}
+.cal-day.today .day-num{box-shadow:inset 0 0 0 1px #b7b1a7}
+.cal-day.selected{background:#f0ece4;border-color:#dad4ca}
+.calendar-legend{display:flex;gap:18px;align-items:center;font-size:11px;color:#837e76;margin-top:12px}
+.legend-circle{display:inline-block;width:17px;height:17px;border:2px solid #3f4740;border-radius:50%;vertical-align:-4px;margin-right:5px}
+.record-detail{margin-top:20px;border-top:1px solid #eee9e1;padding-top:18px}
+.record-detail.empty{color:#8d887f;font-size:13px}
+.detail-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+.detail-date{font-family:Georgia,"Batang",serif;font-size:20px;font-weight:700}
+.detail-part{font-size:12px;color:#817c74;margin-top:4px}
+.detail-question{font-family:Georgia,"Batang",serif;font-size:15px;font-weight:700;line-height:1.55;margin:14px 0 8px}
+.detail-snippet{font-size:13px;line-height:1.7;color:#615d57;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.detail-actions{display:flex;gap:8px;margin-top:16px}
+.danger-btn{color:#8b3b35;border-color:#d7b7b2}
+@media(max-width:560px){.calendar-modal{border-radius:18px}.calendar-head{padding:18px 16px 14px}.calendar-body{padding:14px 16px 20px}.cal-day{border-radius:10px}.cal-day .day-num{width:30px;height:30px}.detail-top{display:block}.detail-actions{display:grid;grid-template-columns:1fr 1fr}.recent-actions{justify-content:flex-start}.recent-item{grid-template-columns:1fr}.recent-snippet{white-space:normal}}
+
+/* 로그인과 클라우드 동기화 */
+.auth-view{min-height:calc(100vh - 48px);display:grid;place-items:center}
+.auth-card{width:min(520px,100%);background:var(--paper);border:1px solid #e5dfd5;border-radius:24px;box-shadow:0 18px 60px rgba(38,34,28,.09);padding:42px}
+.auth-brand{font-family:Georgia,"Times New Roman",serif;font-size:13px;letter-spacing:.18em;color:#77736d;text-transform:uppercase}
+.auth-title{font-family:Georgia,"Batang","Times New Roman",serif;font-size:38px;line-height:1.2;letter-spacing:-.035em;margin:12px 0}
+.auth-copy{font-family:Georgia,"Batang",serif;color:#69655f;line-height:1.8;margin:0 0 26px}
+.auth-form{display:grid;gap:10px}
+.auth-form label{font-size:12px;color:#77726b}
+.auth-form input{width:100%;border:1px solid var(--line);background:#fff;padding:13px 14px;border-radius:12px;outline:none}
+.auth-form input:focus{border-color:#89847b}
+.auth-submit{border:0;background:#303631;color:#fff;border-radius:12px;padding:13px 16px;font-weight:700}
+.auth-submit:disabled{opacity:.55;cursor:wait}
+.auth-status{min-height:22px;margin-top:13px;font-size:13px;line-height:1.6;color:#5f6b60}
+.auth-note{margin-top:20px;padding-top:18px;border-top:1px solid #eee9e1;font-size:12px;line-height:1.7;color:#8a857d}
+.sync-bar{display:flex;align-items:center;justify-content:space-between;gap:18px;border:1px solid #ded9d0;background:#f8f5ef;border-radius:14px;padding:13px 16px;margin-bottom:18px}
+.sync-copy{min-width:0;font-size:12px;color:#6c675f;line-height:1.55}
+.sync-copy strong{display:block;color:#34322f;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sync-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.sync-actions button{padding:7px 11px;font-size:11px;background:#fff}
+.sync-state{font-size:11px;color:#657066}
+@media(max-width:620px){.auth-card{padding:30px 22px}.auth-title{font-size:32px}.sync-bar{align-items:flex-start;flex-direction:column}.sync-actions{justify-content:flex-start}}
+
+@media(max-width:900px){
+  .home-top,.home-main{padding-left:24px;padding-right:24px}.home-title{font-size:38px}.today-card{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.part-grid{grid-template-columns:repeat(2,1fr)}.recent-item{grid-template-columns:92px 82px 1fr}.recent-arrow{display:none}
+}
+@media(max-width:560px){.home-top{flex-direction:column}.home-backup{width:100%}.stats{grid-template-columns:1fr 1fr}.recent-item{grid-template-columns:1fr}.recent-snippet{white-space:normal}.part-grid{grid-template-columns:1fr 1fr}.today-q{font-size:26px}}
+@media print{.home-view{display:none!important}.journal-view{display:block!important}}
+@media (max-width:900px){
+  body{padding:10px}
+  .grid{grid-template-columns:1fr}
+  .left-page{border-right:none;border-bottom:1px solid #ece8e0}
+  .left-page,.right-page{padding:34px 28px 38px}
+  .part-label{display:none}
+  .title{font-size:36px}
+  textarea.answer{min-height:300px}
+  .note-grid{grid-template-columns:1fr}
+}
+@media print{
+  body{background:#fff;padding:0}
+  .toolbar,.footer{display:none!important}
+  .paper{box-shadow:none;border:none;border-radius:0}
+  .grid{min-height:auto}
+}
+</style>
+</head>
+<body>
+<section class="auth-view" id="authView">
+  <div class="auth-card">
+    <div class="auth-brand">Me Time Journal</div>
+    <h1 class="auth-title">나만의 기록으로 들어가기</h1>
+    <p class="auth-copy">이메일로 받은 로그인 링크를 누르면 비밀번호 없이 안전하게 시작할 수 있습니다. 같은 이메일로 로그인하면 아이폰과 컴퓨터에서 같은 기록이 열립니다.</p>
+    <form class="auth-form" id="authForm">
+      <label for="authEmail">이메일</label>
+      <input id="authEmail" type="email" autocomplete="email" inputmode="email" placeholder="name@example.com" required />
+      <button class="auth-submit" id="authSubmit" type="submit">로그인 링크 받기</button>
+    </form>
+    <div class="auth-status" id="authStatus" role="status"></div>
+    <div class="auth-note">비밀번호는 저장하지 않습니다. 로그인 링크를 요청한 뒤 받은 이메일에서 링크를 눌러주세요.</div>
+  </div>
+</section>
+
+<section class="home-view hidden" id="homeView">
+  <div class="home-shell">
+    <header class="home-top">
+      <div>
+        <div class="home-brand">Me Time Journal</div>
+        <h1 class="home-title">나를 발견하는 시간</h1>
+        <p class="home-sub">하루에 한 번, 한 가지 질문. 정답보다 반복되는 나의 패턴을 기록합니다.</p>
+      </div>
+      <button class="home-backup" id="homeExportJson">전체 기록 백업</button>
+    </header>
+
+    <div class="home-main">
+      <div class="sync-bar">
+        <div class="sync-copy"><strong id="userEmail">클라우드 동기화</strong><span id="syncState" class="sync-state">Supabase에 안전하게 저장됩니다.</span></div>
+        <div class="sync-actions">
+          <button id="migrateBtn" class="hidden">기존 기록 옮기기</button>
+          <button id="logoutBtn">로그아웃</button>
+        </div>
+      </div>
+      <div class="today-card">
+        <section class="today-primary">
+          <div>
+            <div class="today-meta">
+              <span class="part-pill" id="homeTodayPart">Part One · 나</span>
+              <span id="homeTodayDate"></span>
+            </div>
+            <div class="today-q" id="homeTodayQuestion"></div>
+          </div>
+          <button class="primary-btn" id="startToday">오늘 기록 시작하기 →</button>
+        </section>
+
+        <aside class="today-side">
+          <div>
+            <div class="side-label">Continue</div>
+            <div class="side-title" id="continueTitle">최근 기록</div>
+            <p class="side-copy" id="continueCopy">이전 기록이 생기면 여기에서 바로 이어볼 수 있습니다.</p>
+          </div>
+          <button class="secondary-btn" id="continueBtn">최근 기록 열기</button>
+        </aside>
+      </div>
+
+      <div class="stats">
+        <div class="stat clickable" id="recordedDaysStat" role="button" tabindex="0" aria-label="기록한 날 달력 보기"><div class="stat-label">기록한 날</div><span class="stat-value" id="statDays">0</span><span class="stat-unit">일</span><span class="stat-hint">눌러서 달력 보기 →</span></div>
+        <div class="stat"><div class="stat-label">연속 기록</div><span class="stat-value" id="statStreak">0</span><span class="stat-unit">일</span></div>
+        <div class="stat"><div class="stat-label">발견한 시간</div><span class="stat-value" id="statMinutes">0</span><span class="stat-unit">분</span></div>
+        <div class="stat"><div class="stat-label">자주 느낀 감정</div><span class="stat-value" id="statEmotion" style="font-size:22px">—</span></div>
+      </div>
+
+      <section class="home-section">
+        <div class="home-section-head">
+          <div><h2>7개의 질문 영역</h2><p>각 영역은 20개의 질문으로 구성됩니다. 답한 질문 수와 기록 횟수를 함께 보여줍니다.</p></div>
+        </div>
+        <div class="part-grid" id="homePartGrid"></div>
+      </section>
+
+      <section class="home-section">
+        <div class="home-section-head">
+          <div><h2>최근 기록</h2><p>과거의 답을 다시 읽으면 생각의 변화가 더 잘 보입니다.</p></div>
+        </div>
+        <div class="recent-list" id="recentList"></div>
+      </section>
+    </div>
+
+    <footer class="home-foot">
+      <span>기록은 로그인한 계정의 Supabase 저장소에 동기화됩니다.</span>
+      <span>JSON 백업도 언제든 내려받을 수 있습니다.</span>
+    </footer>
+  </div>
+</section>
+
+<div class="wrap journal-view hidden" id="journalView">
+  <div class="toolbar">
+    <div class="left">
+      <button id="homeBtn">⌂ 홈</button>
+      <button id="prevDay">← 어제</button>
+      <input id="datePicker" class="date-input" type="date" />
+      <button id="todayBtn">오늘</button>
+      <button id="nextDay">내일 →</button>
+    </div>
+    <div class="right">
+      <button id="saveBtn">저장</button>
+      <button id="deleteCurrent" class="danger-btn">이 기록 삭제</button>
+      <button id="exportMd">Markdown 내보내기</button>
+      <button id="exportJson">백업(JSON)</button>
+      <button onclick="window.print()">인쇄 / PDF</button>
+    </div>
+  </div>
+
+  <main class="paper">
+    <div class="progress">
+      <div class="bar" id="progressBar"></div>
+      <div class="dots" id="dots"></div>
+    </div>
+
+    <div class="grid">
+      <section class="left-page">
+        <div class="part-label" id="partLabel">Part One - 나</div>
+        <div class="kicker" id="partKicker">ME TIME JOURNAL</div>
+        <div class="counter" id="counter">01/07</div>
+        <h1 class="title" id="title">왜 나를 알고 싶나요?</h1>
+        <p class="intro" id="intro"></p>
+        <div class="guide">
+          <h3>가이드 질문</h3>
+          <ul id="guideList"></ul>
+        </div>
+        <div class="quote">
+          <div class="mark">“</div>
+          <div id="quoteText">답을 잘 쓰는 것보다, 내 생각이 어떻게 움직이는지 보는 것이 더 중요하다.</div>
+          <div class="small">오늘의 메모</div>
+        </div>
+      </section>
+
+      <section class="right-page">
+        <div class="date-row">날짜 <div class="date-line" id="dateText"></div></div>
+        <div class="question" id="questionText">나의 답은 무엇인가요?</div>
+        <textarea id="answer" class="answer" placeholder="천천히 적어보세요. 완성된 문장일 필요는 없습니다."></textarea>
+
+        <div class="time-row">
+          <span>나를 발견한 시간</span>
+          <span class="timer" id="timerDisplay">00:00</span>
+          <button class="timer-btn" id="timerToggle">시작</button>
+          <button class="timer-btn" id="timerReset">초기화</button>
+        </div>
+
+        <div class="section-label">위 글에서 기억하고 싶은 세 단어를 꼽아보세요.</div>
+        <div class="words">
+          <input id="word1" maxlength="18" placeholder="단어 1" />
+          <input id="word2" maxlength="18" placeholder="단어 2" />
+          <input id="word3" maxlength="18" placeholder="단어 3" />
+        </div>
+
+        <div class="section-label">답을 적으면서 느낀 감정을 체크해보세요.</div>
+        <div class="emotions" id="emotions"></div>
+
+        <section class="emotion-practice" aria-labelledby="emotionPracticeTitle">
+          <div class="emotion-practice-head">
+            <div>
+              <h3 class="emotion-practice-title" id="emotionPracticeTitle">감정을 알아차리고 받아들이는 4단계</h3>
+              <p class="emotion-practice-copy">감정을 바로 알아내려고 애쓰기보다 <strong>몸 → 이름 → 사실과 해석 → 허용과 필요</strong> 순서로 천천히 좁혀보세요. 정확한 감정명을 맞히는 것이 목표가 아니라, 지금 내 안에서 일어나는 일을 알아차리는 연습입니다.</p>
+            </div>
+          </div>
+
+          <div class="emotion-steps">
+            <div class="emotion-step">
+              <div class="emotion-step-head"><span class="step-no">1</span><h4>몸에서 먼저 찾기</h4></div>
+              <p class="step-help">감정이 잘 안 보이면 생각보다 몸이 먼저 반응합니다. 가슴, 목, 배, 어깨, 얼굴의 느낌을 관찰해보세요.</p>
+              <textarea id="emotionBody" class="emotion-field" placeholder="예: 가슴이 답답하고 어깨에 힘이 들어가 있다. 얼굴이 뜨거워졌다."></textarea>
+            </div>
+
+            <div class="emotion-step">
+              <div class="emotion-step-head"><span class="step-no">2</span><h4>대충이라도 이름 붙이기</h4></div>
+              <p class="step-help">위의 감정 단어 중 가장 가까운 것을 고르세요. 모르겠다면 ‘잘 모르겠음’을 선택해도 충분합니다.</p>
+              <div class="intensity-row">
+                <span>강도</span>
+                <input id="emotionIntensity" type="range" min="0" max="10" step="1" value="0" aria-label="감정 강도" />
+                <span class="intensity-value" id="emotionIntensityValue">0 / 10</span>
+              </div>
+            </div>
+
+            <div class="emotion-step">
+              <div class="emotion-step-head"><span class="step-no">3</span><h4>사실과 해석 분리하기</h4></div>
+              <p class="step-help">무슨 일이 있었는지와, 내가 그 일을 어떻게 받아들였는지를 따로 적으면 감정의 출처가 선명해집니다.</p>
+              <textarea id="emotionSituation" class="emotion-field" placeholder="사실: 실제로 무슨 일이 있었나?"></textarea>
+              <textarea id="emotionThought" class="emotion-field" style="margin-top:8px" placeholder="해석: 나는 그 일을 어떤 의미로 받아들였나?"></textarea>
+            </div>
+
+            <div class="emotion-step">
+              <div class="emotion-step-head"><span class="step-no">4</span><h4>없애지 말고 허용하기</h4></div>
+              <p class="step-help">‘이 감정을 느끼면 안 된다’ 대신, 감정이 있다는 사실만 인정해보세요. 그다음 지금 필요한 것을 한 가지 찾습니다.</p>
+              <textarea id="emotionAccept" class="emotion-field" placeholder="예: 지금 나는 불안을 느끼고 있다. 당장 해결하지 않아도, 이 감정이 있다는 사실은 인정할 수 있다."></textarea>
+              <textarea id="emotionNeed" class="emotion-field" style="margin-top:8px" placeholder="지금 나에게 필요한 것 / 할 수 있는 가장 작은 행동은?"></textarea>
+              <div class="acceptance-cue">“지금 나는 ___을 느끼고 있다. 이 감정이 있는 데에는 이유가 있을 수 있다. 없애기 전에 잠시 알아차려도 괜찮다.”</div>
+            </div>
+          </div>
+          <div class="emotion-tip">감정이 전혀 떠오르지 않는 날에는 1단계만 적어도 됩니다. ‘잘 모르겠다’는 것도 하나의 유효한 관찰입니다.</div>
+        </section>
+
+        <div class="note-grid">
+          <div class="note-card">
+            <label>오늘 새롭게 알아챈 것</label>
+            <textarea id="discovery" placeholder="생각·행동·욕구·반응 중 하나만 적어도 충분합니다."></textarea>
+          </div>
+          <div class="note-card">
+            <label>내일 이어갈 질문</label>
+            <textarea id="nextQuestion" placeholder="오늘 답에서 더 궁금해진 것을 한 문장으로 남겨보세요."></textarea>
+          </div>
+        </div>
+      </section>
+    </div>
+    <div class="footer">
+      <span>기록은 로그인한 계정에 자동 동기화됩니다.</span>
+      <span id="saveStatus" class="save-status">저장 준비됨</span>
+    </div>
+  </main>
+</div>
+
+
+<div class="modal-backdrop hidden" id="calendarBackdrop" role="dialog" aria-modal="true" aria-labelledby="calendarTitle">
+  <section class="calendar-modal">
+    <header class="calendar-head">
+      <div class="calendar-title-wrap">
+        <div class="calendar-title" id="calendarTitle">기록 달력</div>
+        <div class="calendar-count" id="calendarCount"></div>
+      </div>
+      <div class="calendar-nav">
+        <button class="icon-btn" id="calPrev" aria-label="이전 달">←</button>
+        <button id="calToday">오늘</button>
+        <button class="icon-btn" id="calNext" aria-label="다음 달">→</button>
+        <button class="icon-btn" id="calClose" aria-label="닫기">×</button>
+      </div>
+    </header>
+    <div class="calendar-body">
+      <div class="weekdays"><div class="weekday">일</div><div class="weekday">월</div><div class="weekday">화</div><div class="weekday">수</div><div class="weekday">목</div><div class="weekday">금</div><div class="weekday">토</div></div>
+      <div class="calendar-grid" id="calendarGrid"></div>
+      <div class="calendar-legend"><span><span class="legend-circle"></span>기록한 날</span><span>날짜를 누르면 기록을 확인할 수 있어요.</span></div>
+      <div class="record-detail empty" id="recordDetail">동그라미 표시된 날짜를 선택해보세요.</div>
+    </div>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://fgrwdqdfafikmxvrhbmd.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_4-E4mPBMxXceDC-m5IOh8w_ZtZKLkgq';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const JOURNAL = [
+  {
+    name:'나', label:'Part One - 나',
+    title:'왜 나를 알고 싶나요?',
+    intro:'나를 안다는 것은 정보를 많이 모으는 일이 아니라, 반복되는 선택과 반응 속에서 나만의 기준을 발견하는 일에 가깝습니다. 오늘은 “나는 누구인가”보다 “나는 왜 나를 알고 싶은가”에서 시작해봅니다.',
+    guides:['최근 내 행동이 스스로 이해되지 않았던 순간은 언제였나요?','결정이 어려울 때 나는 무엇을 가장 먼저 확인하나요?'],
+    prompts:[
+      '지금의 나는 어떤 사람이라고 설명하고 싶은가요?',
+      '요즘 나를 가장 많이 움직이게 하는 욕구는 무엇인가요?',
+      '나는 어떤 순간에 “나다운 선택”을 했다고 느끼나요?',
+      '남들이 모르는 나의 강점 한 가지는 무엇인가요?',
+      '반복해서 후회하는 선택에는 어떤 공통점이 있나요?',
+      '혼자 있을 때의 나는 사람들과 있을 때의 나와 어떻게 다른가요?',
+      '요즘 내 선택에 가장 크게 영향을 주는 타인의 기대는 무엇인가요?',
+      '어떤 상황에서 나는 유난히 에너지가 빠르게 소진되나요?',
+      '불확실한 상황에서 나는 보통 통제, 회피, 탐색 중 무엇을 하나요?',
+      '내가 실제로 중요하게 여기는 가치는 시간과 돈의 사용에서 어떻게 드러나나요?',
+      '나는 나 자신에게 어떤 기준을 가장 가혹하게 적용하나요?',
+      '비용이 크더라도 지키고 싶은 나만의 원칙은 무엇인가요?',
+      '요즘 스스로에게 인정하기 꺼리는 사실이 하나 있다면 무엇인가요?',
+      '지금까지 들었던 칭찬 중 이상하게 오래 기억에 남는 말은 무엇이며 왜 그런가요?',
+      '최근의 질투나 부러움은 내가 무엇을 원한다는 신호일까요?',
+      '내가 맡고 있는 역할들을 모두 빼고 나면 무엇이 나를 설명하나요?',
+      '과거의 나와 지금의 내가 가장 다르게 믿는 것은 무엇인가요?',
+      '무너뜨리고 싶지 않은 나의 작은 루틴 하나는 무엇인가요?',
+      '나는 누구를 실망시키는 것을 가장 두려워하며, 그 이유는 무엇인가요?',
+      '지금의 나에게 제목을 붙인다면 어떤 제목이 어울리나요?'
+    ]
+  },
+  {
+    name:'취향', label:'Part Two - 취향',
+    title:'내가 좋아하는 것에는 어떤 패턴이 있나요?',
+    intro:'취향은 사소해 보이지만, 시간과 돈을 어디에 쓰는지 보여주는 매우 정직한 데이터입니다. 좋아하는 것들을 분해해 보면 내가 중요하게 여기는 가치가 드러납니다.',
+    guides:['최근 유난히 끌렸던 장소·콘텐츠·사람은 무엇이었나요?','그 대상의 어떤 요소가 나에게 만족감을 줬나요?'],
+    prompts:[
+      '요즘 반복해서 찾는 것 세 가지에는 어떤 공통점이 있나요?',
+      '돈을 아깝지 않게 쓰는 대상은 무엇인가요?',
+      '시간이 생기면 자연스럽게 하게 되는 일은 무엇인가요?',
+      '내 취향이 바뀌었다고 느끼는 영역은 어디인가요?',
+      '남의 시선이 없다면 무엇을 더 좋아한다고 말할 수 있나요?',
+      '내가 가장 편안함을 느끼는 공간에는 어떤 요소가 있나요?',
+      '좋아하는 사람들의 공통된 분위기나 태도는 무엇인가요?',
+      '최근 저장하거나 다시 본 콘텐츠 세 개의 공통점은 무엇인가요?',
+      '내가 싫어하는 것들을 나열하면 어떤 기준이 보이나요?',
+      '옷, 공간, 음악 중 내 취향이 가장 선명하게 드러나는 영역은 어디인가요?',
+      '비싸더라도 더 좋은 것을 선택하고 싶은 품목은 무엇인가요?',
+      '반대로 기능만 충분하면 저렴해도 괜찮은 것은 무엇인가요?',
+      '여행지에서 나는 계획된 곳과 우연히 발견한 곳 중 어디에 더 끌리나요?',
+      '사람이 많은 곳과 조용한 곳 중 어느 쪽에서 더 충전되며 왜 그런가요?',
+      '내가 좋아하는 브랜드 세 개는 어떤 감각이나 가치를 공유하나요?',
+      '최근 새롭게 생긴 취향 하나는 무엇이며 무엇이 계기였나요?',
+      '어릴 때 좋아했던 것 중 지금까지 남아 있는 취향은 무엇인가요?',
+      '내가 반복해서 선택하는 음식에는 어떤 기준이 있나요?',
+      '완전히 자유로운 하루가 주어진다면 어떤 순서로 시간을 쓰고 싶나요?',
+      '내 취향을 세 단어로 요약한다면 무엇인가요?'
+    ]
+  },
+  {
+    name:'감정', label:'Part Three - 감정',
+    title:'오늘의 감정은 무엇을 말해주나요?',
+    intro:'감정은 정확히 맞혀야 하는 정답이 아니라 몸과 마음이 보내는 신호입니다. 감정을 바로 알아차리기 어렵다면 몸의 반응부터 시작해도 됩니다. 이름을 붙이고, 사실과 해석을 나누고, 없애려 하기보다 잠시 허용하는 연습을 반복하면 내 반응의 패턴이 조금씩 선명해집니다.',
+    guides:['감정 이름이 떠오르지 않는다면 몸에서는 어떤 변화가 느껴지나요?','그 감정을 없애려 하지 않고 잠시 인정한다면 지금 나에게 필요한 것은 무엇인가요?'],
+    prompts:[
+      '오늘 가장 크게 흔들린 순간은 무엇이었나요?',
+      '불편함을 느낀 순간, 나는 무엇을 기대하고 있었나요?',
+      '기분이 좋아졌던 순간에는 어떤 조건이 있었나요?',
+      '최근 자주 피하고 있는 감정이 있나요?',
+      '지금의 감정을 한 문장으로 번역하면 무엇인가요?',
+      '오늘 내 몸에서 가장 먼저 느껴진 감정의 신호는 무엇이었나요?',
+      '최근 화가 났던 순간에 실제로 침해당했다고 느낀 것은 무엇인가요?',
+      '불안할 때 나는 정보를 더 찾나요, 행동하나요, 멈추나요?',
+      '슬플 때 나는 혼자 있는 것과 누군가와 이야기하는 것 중 무엇이 더 도움이 되나요?',
+      '최근 죄책감을 느낀 일은 내 가치와 어떤 관련이 있나요?',
+      '오늘 가장 평온했던 순간은 언제였고 무엇이 그 평온을 만들었나요?',
+      '최근 설렘을 느낀 대상은 무엇이며 어떤 가능성을 상상했나요?',
+      '외로움을 느낄 때 내가 실제로 원하는 것은 사람, 이해, 자극 중 무엇에 가까운가요?',
+      '안도감을 느꼈던 최근 순간은 무엇이며 그전에는 무엇을 걱정했나요?',
+      '최근 스스로가 자랑스러웠던 순간을 구체적으로 적어보세요.',
+      '아무 감정도 느끼고 싶지 않았던 순간이 있다면 무엇 때문이었나요?',
+      '후회가 반복해서 떠오르는 일에서 내가 배우고 싶은 것은 무엇인가요?',
+      '오늘 고마움을 느낀 가장 작은 순간은 무엇이었나요?',
+      '같은 상황에서 감정과 생각을 분리해 적는다면 각각 무엇인가요?',
+      '지금 느끼는 감정이 나에게 한 가지 부탁을 한다면 무엇일까요?'
+    ]
+  },
+  {
+    name:'사랑', label:'Part Four - 사랑',
+    title:'나는 어떻게 사랑을 느끼고 표현하나요?',
+    intro:'사랑은 감정인 동시에 행동의 패턴입니다. 내가 무엇을 사랑이라고 받아들이는지, 또 어떤 방식으로 사랑을 보여주는지를 보면 관계에서 원하는 것이 선명해집니다.',
+    guides:['누군가에게 고마움을 크게 느꼈던 최근 순간은 언제였나요?','나는 말·시간·행동 중 무엇으로 애정을 가장 잘 표현하나요?'],
+    prompts:[
+      '나는 어떤 행동을 사랑의 표현이라고 느끼나요?',
+      '사랑하는 사람에게 바라는 가장 작은 배려는 무엇인가요?',
+      '좋아하는 사람 앞에서 나는 어떤 사람이 되나요?',
+      '관계에서 꼭 지키고 싶은 경계는 무엇인가요?',
+      '내가 더 자주 표현하고 싶은 마음은 무엇인가요?',
+      '누군가가 나를 진심으로 이해한다고 느끼는 순간은 언제인가요?',
+      '애정을 받을 때 말, 시간, 도움, 스킨십, 선물 중 무엇이 가장 크게 와닿나요?',
+      '나는 사랑하는 사람을 위해 자연스럽게 무엇을 하게 되나요?',
+      '갈등이 생기면 나는 먼저 해결하려 하나요, 시간을 두려 하나요?',
+      '관계에서 안전하다고 느끼게 만드는 행동은 무엇인가요?',
+      '사랑 때문에 포기할 수 있는 것과 포기하고 싶지 않은 것은 각각 무엇인가요?',
+      '상대의 독립성을 존중한다는 것은 내게 어떤 행동을 의미하나요?',
+      '최근 사랑하는 사람에게 충분히 말하지 못한 고마움은 무엇인가요?',
+      '상대에게 서운할 때 내가 실제로 바라는 것은 무엇인가요?',
+      '내가 사랑받고 있다고 착각하기 쉬운 신호가 있다면 무엇인가요?',
+      '좋은 관계를 위해 내가 고치고 싶은 습관 하나는 무엇인가요?',
+      '사랑하는 사람의 성장을 돕는 것과 통제하는 것의 경계는 어디라고 생각하나요?',
+      '내가 관계에서 가장 두려워하는 상실은 무엇인가요?',
+      '오래 함께하고 싶은 사람과 꼭 공유하고 싶은 가치는 무엇인가요?',
+      '내가 생각하는 성숙한 사랑을 한 문장으로 정의한다면 무엇인가요?'
+    ]
+  },
+  {
+    name:'관계', label:'Part Five - 관계',
+    title:'사람들과 있을 때 나는 어떤 모습인가요?',
+    intro:'관계는 나를 비추는 거울입니다. 누구와 있을 때 편해지는지, 어떤 상황에서 에너지가 소모되는지 관찰하면 나의 관계 방식과 필요가 보입니다.',
+    guides:['오늘 누군가의 표정·말투·행동에서 새롭게 본 점이 있었나요?','상대방과 더 가까워지려면 어떤 질문이 도움이 될까요?'],
+    prompts:[
+      '오늘 만난 사람 중 한 명을 자세히 떠올려보세요. 무엇이 보이나요?',
+      '나는 어떤 사람 앞에서 가장 편하게 말하나요?',
+      '관계에서 자주 오해받는 내 모습은 무엇인가요?',
+      '오늘 누군가에게 더 관심을 가질 수 있었던 순간은 언제였나요?',
+      '상대방을 더 잘 알기 위해 다음에 무엇을 물어보고 싶나요?',
+      '오늘 누군가가 반복해서 사용한 단어나 주제는 무엇이었나요?',
+      '최근 대화에서 상대가 말하지 않았지만 중요해 보였던 것은 무엇인가요?',
+      '나는 대화 중 상대의 말을 듣기보다 다음 말을 준비하는 순간이 언제 많나요?',
+      '누군가와 빠르게 가까워졌던 경험에는 어떤 공통점이 있었나요?',
+      '반대로 관계가 멀어졌던 경험에는 어떤 패턴이 있었나요?',
+      '내가 신뢰하는 사람들은 어떤 행동을 반복적으로 보여주나요?',
+      '사람을 처음 만날 때 내가 가장 먼저 관찰하는 것은 무엇인가요?',
+      '오늘 만난 사람의 현재 관심사를 한 가지 추론한다면 무엇이며 근거는 무엇인가요?',
+      '상대가 편하게 더 많이 이야기하도록 만드는 내 질문 방식은 무엇인가요?',
+      '최근 누군가에게 내가 먼저 연락하지 못한 이유는 무엇인가요?',
+      '나는 부탁하거나 도움을 요청하는 것을 얼마나 편하게 느끼나요? 그 이유는 무엇인가요?',
+      '관계에서 에너지를 얻는 사람과 잃는 사람의 차이는 무엇인가요?',
+      '오늘 대화에서 내가 놓친 상대의 감정 신호가 있었을까요?',
+      '한 사람을 더 잘 이해하기 위해 앞으로 관찰하고 싶은 세 가지는 무엇인가요?',
+      '내가 더 좋은 친구·동료·연인이 되기 위해 이번 주 한 번 실천할 행동은 무엇인가요?'
+    ]
+  },
+  {
+    name:'목표', label:'Part Six - 목표',
+    title:'나는 어디로 가고 있나요?',
+    intro:'목표는 미래의 점이 아니라 오늘의 자원 배분 방식입니다. 무엇을 하겠다는 선언보다, 무엇에 시간을 쓰고 무엇을 포기하는지에서 실제 우선순위가 드러납니다.',
+    guides:['요즘 가장 많은 시간을 쓰는 일은 내가 중요하다고 말하는 것과 일치하나요?','내가 지금 줄여야 할 한 가지는 무엇인가요?'],
+    prompts:[
+      '지금 가장 중요한 목표 하나를 한 문장으로 적는다면?',
+      '이 목표를 위해 이번 주에 포기해야 할 것은 무엇인가요?',
+      '내 목표가 남의 기대가 아니라는 증거는 무엇인가요?',
+      '3개월 뒤 달라져 있기를 바라는 것은 무엇인가요?',
+      '오늘 한 선택 중 미래의 나에게 가장 도움이 되는 것은 무엇이었나요?',
+      '이 목표를 달성했을 때 실제로 달라지는 내 하루는 무엇인가요?',
+      '목표의 진척을 숫자로 측정한다면 어떤 지표가 가장 적합할까요?',
+      '지금 목표 달성을 막는 가장 큰 병목은 능력, 시간, 용기, 집중 중 무엇인가요?',
+      '현재 하고 있는 일 중 성과에 거의 기여하지 않는 것은 무엇인가요?',
+      '매일 30분만 투자할 수 있다면 어디에 쓰는 것이 가장 큰 복리효과를 낼까요?',
+      '목표를 이루기 위해 새로 시작하기보다 중단해야 할 습관은 무엇인가요?',
+      '이 목표에 대해 내가 틀렸을 가능성이 가장 큰 가정은 무엇인가요?',
+      '지금보다 10배 큰 목표를 세운다면 접근 방식은 어떻게 달라져야 하나요?',
+      '반대로 목표를 절반으로 줄이면 반드시 남겨야 할 핵심은 무엇인가요?',
+      '실패한다고 가정했을 때 가장 가능성 높은 원인은 무엇인가요?',
+      '앞으로 7일 안에 할 수 있는 가장 작은 다음 행동은 무엇인가요?',
+      '이 목표를 계속할지 그만둘지 판단할 기준을 미리 정한다면 무엇인가요?',
+      '내가 롤모델로 보는 사람은 이 목표를 어떤 방식으로 접근할 것 같나요?',
+      '지금의 시간 배분표를 보면 내가 실제로 추구하는 목표는 무엇처럼 보이나요?',
+      '1년 뒤의 내가 오늘의 나에게 가장 먼저 해주고 싶은 조언은 무엇일까요?'
+    ]
+  },
+  {
+    name:'유한함', label:'Part Seven - 유한함',
+    title:'시간이 유한하다는 사실은 무엇을 바꾸나요?',
+    intro:'삶의 끝을 생각하는 것은 우울해지기 위한 일이 아니라, 지금의 우선순위를 선명하게 만드는 방법이 될 수 있습니다. 두려움보다 “무엇을 놓치고 싶지 않은가”에 초점을 맞춰봅니다.',
+    guides:['시간이 충분하지 않다고 느껴질 때 가장 아쉬운 것은 무엇인가요?','지금의 삶에서 더 많이 남기고 싶은 장면은 무엇인가요?'],
+    prompts:[
+      '오늘이 평소보다 더 귀하게 느껴진 순간은 언제였나요?',
+      '지금 하지 않으면 언젠가 가장 아쉬울 일은 무엇인가요?',
+      '나에게 “잘 산 하루”는 어떤 하루인가요?',
+      '내 삶에서 더 적게 가져도 되는 것은 무엇인가요?',
+      '내가 오래 기억되고 싶은 모습은 무엇인가요?',
+      '시간이 지금의 절반만 남았다고 느낀다면 무엇을 먼저 바꾸고 싶나요?',
+      '반드시 한 번은 경험하고 싶은 장면이 있다면 무엇인가요?',
+      '더 자주 만나고 싶은 사람은 누구이며 왜 지금 충분히 만나지 못하고 있나요?',
+      '지금 쌓고 있는 것 중 시간이 지나도 의미가 남을 것은 무엇인가요?',
+      '언젠가 끝난다는 사실 때문에 오히려 더 소중해지는 것은 무엇인가요?',
+      '내가 가진 물건 중 없어도 삶의 만족이 거의 줄지 않을 것은 무엇인가요?',
+      '일이 내 삶 전체에서 차지했으면 하는 비중은 어느 정도인가요?',
+      '성과와 경험 중 지금의 나는 어느 쪽에 지나치게 치우쳐 있나요?',
+      '미래의 후회를 하나 줄이기 위해 이번 달에 할 수 있는 일은 무엇인가요?',
+      '내가 떠난 뒤 가까운 사람들이 나를 어떤 사람으로 기억하면 좋겠나요?',
+      '지금 가장 아끼는 사람에게 아직 하지 못한 말이 있나요?',
+      '돈으로 살 수 없지만 더 많이 확보하고 싶은 것은 무엇인가요?',
+      '내 인생에서 이미 충분하다고 말할 수 있는 것은 무엇인가요?',
+      '오늘 하루를 다시 살 수 없다면, 무엇에 쓴 시간이 가장 아깝고 무엇이 가장 좋았나요?',
+      '지금의 삶에서 “나중에”가 아니라 “지금”으로 옮기고 싶은 것은 무엇인가요?'
+    ]
+  }
+];
+
+const EMOTIONS=['잘 모르겠음','기쁨','평온','만족','감사','설렘','기대','호기심','자신감','불안','걱정','압박감','혼란','짜증','분노','서운함','슬픔','외로움','죄책감','수치심','부러움','무기력','우울'];
+let currentDate = new Date();
+let seconds = 0;
+let timerId = null;
+let calendarMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+let selectedCalendarDate = null;
+let currentUser = null;
+let saveChain = Promise.resolve();
+let activeSessionUserId = null;
+const entryCache = new Map();
+const $ = id => document.getElementById(id);
+
+function isoDate(d){
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function dateFromIso(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+function seedForDate(d){ return Math.floor(new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime()/86400000); }
+function promptFor(d){
+  const seed = seedForDate(d);
+  const partIndex = ((seed % JOURNAL.length)+JOURNAL.length)%JOURNAL.length;
+  const part = JOURNAL[partIndex];
+  const pIndex = Math.floor(seed / JOURNAL.length) % part.prompts.length;
+  return {partIndex, part, prompt:part.prompts[pIndex]};
+}
+function updatePage(){
+  const {partIndex,part,prompt}=promptFor(currentDate);
+  $('datePicker').value=isoDate(currentDate);
+  $('dateText').textContent=currentDate.toLocaleDateString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit'});
+  $('partLabel').textContent=part.label;
+  $('partKicker').textContent='ME TIME JOURNAL · '+part.name;
+  $('counter').textContent=String(partIndex+1).padStart(2,'0')+'/07';
+  $('title').textContent=part.title;
+  $('intro').textContent=part.intro;
+  $('questionText').textContent=prompt;
+  $('guideList').innerHTML=part.guides.map(x=>`<li>${x}</li>`).join('');
+  $('progressBar').style.setProperty('--pct', ((partIndex+1)/7*100)+'%');
+  $('dots').innerHTML=JOURNAL.map((_,i)=>`<span class="dot ${i===partIndex?'active':''}"></span>`).join('');
+  loadEntry();
+}
+function getEntry(){
+  return {
+    answer:$('answer').value,
+    words:[$('word1').value,$('word2').value,$('word3').value],
+    emotions:[...document.querySelectorAll('.chip.active')].map(x=>x.dataset.value),
+    emotionBody:$('emotionBody').value,
+    emotionIntensity:Number($('emotionIntensity').value)||0,
+    emotionSituation:$('emotionSituation').value,
+    emotionThought:$('emotionThought').value,
+    emotionAccept:$('emotionAccept').value,
+    emotionNeed:$('emotionNeed').value,
+    discovery:$('discovery').value,
+    nextQuestion:$('nextQuestion').value,
+    seconds,
+    question:$('questionText').textContent,
+    part:$('partKicker').textContent
+  };
+}
+function entryToRow(dateStr, entry){
+  return {
+    user_id:currentUser.id,
+    entry_date:dateStr,
+    part:entry.part||'',
+    question:entry.question||'',
+    answer:entry.answer||'',
+    words:Array.isArray(entry.words)?entry.words:[],
+    emotions:Array.isArray(entry.emotions)?entry.emotions:[],
+    emotion_body:entry.emotionBody||'',
+    emotion_intensity:Number(entry.emotionIntensity)||0,
+    emotion_situation:entry.emotionSituation||'',
+    emotion_thought:entry.emotionThought||'',
+    emotion_accept:entry.emotionAccept||'',
+    emotion_need:entry.emotionNeed||'',
+    discovery:entry.discovery||'',
+    next_question:entry.nextQuestion||'',
+    seconds:Math.max(0,Number(entry.seconds)||0)
+  };
+}
+function rowToEntry(row){
+  return {
+    answer:row.answer||'',
+    words:Array.isArray(row.words)?row.words:[],
+    emotions:Array.isArray(row.emotions)?row.emotions:[],
+    emotionBody:row.emotion_body||'',
+    emotionIntensity:Number(row.emotion_intensity)||0,
+    emotionSituation:row.emotion_situation||'',
+    emotionThought:row.emotion_thought||'',
+    emotionAccept:row.emotion_accept||'',
+    emotionNeed:row.emotion_need||'',
+    discovery:row.discovery||'',
+    nextQuestion:row.next_question||'',
+    seconds:Math.max(0,Number(row.seconds)||0),
+    question:row.question||'',
+    part:row.part||''
+  };
+}
+function setSyncStatus(message, isError=false){
+  $('syncState').textContent=message;
+  $('syncState').style.color=isError?'#9b453e':'';
+}
+function saveEntry(show=true){
+  if(!currentUser) return Promise.resolve(false);
+  const dateStr=isoDate(currentDate);
+  const entry=getEntry();
+  if(!isMeaningfulEntry(entry)&&!entryCache.has(dateStr)){
+    if(show) $('saveStatus').textContent='작성한 내용이 없습니다.';
+    return Promise.resolve(false);
+  }
+  entryCache.set(dateStr,entry);
+  updateMigrationButton();
+  if(show) $('saveStatus').textContent='저장 중…';
+  setSyncStatus('동기화 중…');
+  saveChain=saveChain.catch(()=>{}).then(async()=>{
+    const {error}=await supabaseClient
+      .from('journal_entries')
+      .upsert(entryToRow(dateStr,entry),{onConflict:'user_id,entry_date'});
+    if(error){
+      console.error(error);
+      if(isoDate(currentDate)===dateStr) $('saveStatus').textContent='저장 실패 · 인터넷 연결을 확인해주세요.';
+      setSyncStatus('동기화에 실패했습니다. 잠시 후 다시 시도해주세요.',true);
+      return false;
+    }
+    if(isoDate(currentDate)===dateStr){
+      $('saveStatus').textContent='저장됨 · '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+    }
+    setSyncStatus('Supabase에 동기화됨');
+    renderHome();
+    if(!$('calendarBackdrop').classList.contains('hidden')) renderCalendar();
+    return true;
+  });
+  return saveChain;
+}
+function loadEntry(){
+  stopTimer();
+  const data=entryCache.get(isoDate(currentDate))||{};
+  $('answer').value=data.answer||'';
+  $('word1').value=(data.words&&data.words[0])||'';
+  $('word2').value=(data.words&&data.words[1])||'';
+  $('word3').value=(data.words&&data.words[2])||'';
+  $('emotionBody').value=data.emotionBody||'';
+  $('emotionIntensity').value=Number.isFinite(Number(data.emotionIntensity))?Number(data.emotionIntensity):0;
+  $('emotionIntensityValue').textContent=`${$('emotionIntensity').value} / 10`;
+  $('emotionSituation').value=data.emotionSituation||'';
+  $('emotionThought').value=data.emotionThought||'';
+  $('emotionAccept').value=data.emotionAccept||'';
+  $('emotionNeed').value=data.emotionNeed||'';
+  $('discovery').value=data.discovery||'';
+  $('nextQuestion').value=data.nextQuestion||'';
+  if(data.question) $('questionText').textContent=data.question;
+  seconds=data.seconds||0; renderTimer();
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('active',(data.emotions||[]).includes(c.dataset.value)));
+  $('saveStatus').textContent=entryCache.has(isoDate(currentDate))?'이 날짜의 기록을 불러왔습니다.':'새 기록';
+}
+function changeDay(delta){ saveEntry(false); currentDate.setDate(currentDate.getDate()+delta); updatePage(); }
+function renderTimer(){ const m=String(Math.floor(seconds/60)).padStart(2,'0'), s=String(seconds%60).padStart(2,'0'); $('timerDisplay').textContent=`${m}:${s}`; }
+function startTimer(){ if(timerId) return; timerId=setInterval(()=>{seconds++;renderTimer(); if(seconds%10===0)saveEntry(false)},1000); $('timerToggle').textContent='일시정지'; }
+function stopTimer(){ if(timerId){clearInterval(timerId);timerId=null;} if($('timerToggle'))$('timerToggle').textContent='시작'; }
+function resetTimer(){ stopTimer(); seconds=0; renderTimer(); saveEntry(false); }
+function download(name,content,type='text/plain'){
+  const blob=new Blob([content],{type}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); URL.revokeObjectURL(a.href);
+}
+function exportMarkdown(){
+  const e=getEntry();
+  const md=`# Me Time Journal — ${isoDate(currentDate)}\n\n## ${e.part}\n\n**질문**  \n${e.question}\n\n## 나의 답\n${e.answer||''}\n\n**기억하고 싶은 세 단어**  \n${e.words.filter(Boolean).join(' · ')}\n\n**감정**  \n${e.emotions.join(' · ')}\n\n## 감정 알아차리기 4단계\n\n**1. 몸의 신호**  \n${e.emotionBody||''}\n\n**2. 감정 강도**  \n${e.emotionIntensity||0} / 10\n\n**3. 사실**  \n${e.emotionSituation||''}\n\n**3. 나의 해석**  \n${e.emotionThought||''}\n\n**4. 감정을 허용하는 말**  \n${e.emotionAccept||''}\n\n**4. 지금 필요한 것 / 작은 행동**  \n${e.emotionNeed||''}\n\n## 오늘 새롭게 알아챈 것\n${e.discovery||''}\n\n## 내일 이어갈 질문\n${e.nextQuestion||''}\n\n**나를 발견한 시간:** ${$('timerDisplay').textContent}\n`;
+  download(`me-time-${isoDate(currentDate)}.md`,md,'text/markdown');
+}
+function exportJson(){
+  const all={};
+  allSavedEntries().slice().reverse().forEach(x=>{all[x.date]=x.data;});
+  download(`me-time-journal-backup-${isoDate(new Date())}.json`,JSON.stringify(all,null,2),'application/json');
+}
+
+function localEntriesForMigration(){
+  return Object.keys(localStorage)
+    .filter(k=>/^meTimeJournal:\d{4}-\d{2}-\d{2}$/.test(k))
+    .map(k=>{
+      try{return {date:k.replace('meTimeJournal:',''),data:JSON.parse(localStorage.getItem(k))||{}};}
+      catch{return null;}
+    })
+    .filter(x=>x&&isMeaningfulEntry(x.data))
+    .sort((a,b)=>a.date.localeCompare(b.date));
+}
+function updateMigrationButton(){
+  const pending=localEntriesForMigration().filter(x=>!entryCache.has(x.date));
+  if(pending.length){
+    $('migrateBtn').textContent=`기존 기록 ${pending.length}개 옮기기`;
+    $('migrateBtn').classList.remove('hidden');
+  }else{
+    $('migrateBtn').classList.add('hidden');
+  }
+}
+async function migrateLocalEntries(){
+  if(!currentUser) return;
+  await saveChain.catch(()=>{});
+  const pending=localEntriesForMigration().filter(x=>!entryCache.has(x.date));
+  if(!pending.length){updateMigrationButton();return;}
+  const ok=confirm(`이 브라우저에 남아 있는 기존 기록 ${pending.length}개를 현재 로그인한 계정으로 옮길까요?\n기존 브라우저 사본은 안전을 위해 그대로 둡니다.`);
+  if(!ok) return;
+  $('migrateBtn').disabled=true;
+  setSyncStatus(`기존 기록 ${pending.length}개를 옮기는 중…`);
+  try{
+    for(let i=0;i<pending.length;i+=100){
+      const batch=pending.slice(i,i+100).map(x=>entryToRow(x.date,x.data));
+      const {error}=await supabaseClient.from('journal_entries').upsert(batch,{onConflict:'user_id,entry_date'});
+      if(error) throw error;
+    }
+    pending.forEach(x=>entryCache.set(x.date,x.data));
+    localStorage.setItem(`meTimeJournal:migrated:${currentUser.id}`,new Date().toISOString());
+    updateMigrationButton();
+    renderHome();
+    setSyncStatus(`기존 기록 ${pending.length}개를 옮겼습니다.`);
+    alert(`기존 기록 ${pending.length}개를 Supabase로 옮겼습니다.`);
+  }catch(error){
+    console.error(error);
+    setSyncStatus('기존 기록을 옮기지 못했습니다.',true);
+    alert('기존 기록을 옮기지 못했습니다. 인터넷 연결을 확인한 뒤 다시 시도해주세요.');
+  }finally{
+    $('migrateBtn').disabled=false;
+  }
+}
+async function loadEntries(){
+  entryCache.clear();
+  setSyncStatus('기록을 불러오는 중…');
+  const pageSize=1000;
+  for(let from=0;;from+=pageSize){
+    const {data,error}=await supabaseClient
+      .from('journal_entries')
+      .select('entry_date,part,question,answer,words,emotions,emotion_body,emotion_intensity,emotion_situation,emotion_thought,emotion_accept,emotion_need,discovery,next_question,seconds')
+      .eq('user_id',currentUser.id)
+      .order('entry_date',{ascending:true})
+      .range(from,from+pageSize-1);
+    if(error) throw error;
+    (data||[]).forEach(row=>entryCache.set(row.entry_date,rowToEntry(row)));
+    if(!data||data.length<pageSize) break;
+  }
+  setSyncStatus('Supabase에 동기화됨');
+}
+function showAuth(message=''){
+  stopTimer();
+  closeCalendar();
+  $('homeView').classList.add('hidden');
+  $('journalView').classList.add('hidden');
+  $('authView').classList.remove('hidden');
+  $('authStatus').textContent=message;
+}
+async function handleSession(session){
+  const user=session?.user||null;
+  if(!user){
+    currentUser=null;
+    activeSessionUserId=null;
+    entryCache.clear();
+    showAuth();
+    return;
+  }
+  if(activeSessionUserId===user.id&&currentUser) return;
+  currentUser=user;
+  activeSessionUserId=user.id;
+  $('userEmail').textContent=user.email||'로그인된 계정';
+  $('authView').classList.add('hidden');
+  $('homeView').classList.remove('hidden');
+  $('journalView').classList.add('hidden');
+  try{
+    await loadEntries();
+    updateMigrationButton();
+    if(location.hash==='#journal') showJournal(currentDate); else showHome();
+  }catch(error){
+    console.error(error);
+    setSyncStatus('기록을 불러오지 못했습니다. 데이터베이스 설정을 확인해주세요.',true);
+    renderHome();
+  }
+}
+async function initAuth(){
+  if(SUPABASE_ANON_KEY==='__SUPABASE_ANON_KEY__'){
+    $('authSubmit').disabled=true;
+    showAuth('Supabase 연결 설정을 마무리하는 중입니다.');
+    return;
+  }
+  supabaseClient.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>handleSession(session),0);});
+  const {data,error}=await supabaseClient.auth.getSession();
+  if(error){
+    console.error(error);
+    showAuth('로그인 상태를 확인하지 못했습니다. 페이지를 새로고침해주세요.');
+    return;
+  }
+  await handleSession(data.session);
+}
+
+
+function escapeHTML(str=''){
+  return String(str).replace(/[&<>'"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+}
+function allSavedEntries(){
+  return [...entryCache.entries()]
+    .map(([date,data])=>({date,data}))
+    .filter(x=>isMeaningfulEntry(x.data))
+    .sort((a,b)=>b.date.localeCompare(a.date));
+}
+function isMeaningfulEntry(e){
+  return !!((e.answer||'').trim() || (e.emotionBody||'').trim() || (e.emotionSituation||'').trim() || (e.emotionThought||'').trim() || (e.emotionAccept||'').trim() || (e.emotionNeed||'').trim() || Number(e.emotionIntensity)>0 || (e.discovery||'').trim() || (e.nextQuestion||'').trim() || (Array.isArray(e.words)&&e.words.some(Boolean)) || (Array.isArray(e.emotions)&&e.emotions.length) || Number(e.seconds)>0);
+}
+function streakCount(entries){
+  const set=new Set(entries.map(x=>x.date));
+  let d=new Date();
+  if(!set.has(isoDate(d))) d.setDate(d.getDate()-1);
+  let n=0;
+  while(set.has(isoDate(d))){n++;d.setDate(d.getDate()-1)}
+  return n;
+}
+function showHome(){
+  stopTimer();
+  $('journalView').classList.add('hidden');
+  $('homeView').classList.remove('hidden');
+  location.hash='home';
+  renderHome();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function showJournal(date=new Date()){
+  currentDate=new Date(date.getFullYear(),date.getMonth(),date.getDate());
+  $('homeView').classList.add('hidden');
+  $('journalView').classList.remove('hidden');
+  location.hash='journal';
+  updatePage();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+async function removeEntry(dateStr, options={}){
+  if(!entryCache.has(dateStr) || !currentUser) return false;
+  const ok=options.skipConfirm || confirm(`${dateStr} 기록을 삭제할까요?\n삭제한 기록은 되돌릴 수 없습니다.`);
+  if(!ok) return false;
+  await saveChain.catch(()=>{});
+  setSyncStatus('기록을 삭제하는 중…');
+  const {error}=await supabaseClient
+    .from('journal_entries')
+    .delete()
+    .eq('user_id',currentUser.id)
+    .eq('entry_date',dateStr);
+  if(error){
+    console.error(error);
+    alert('기록을 삭제하지 못했습니다. 인터넷 연결을 확인한 뒤 다시 시도해주세요.');
+    setSyncStatus('삭제에 실패했습니다.',true);
+    return false;
+  }
+  entryCache.delete(dateStr);
+  setSyncStatus('Supabase에 동기화됨');
+  if(isoDate(currentDate)===dateStr && !$('journalView').classList.contains('hidden')){
+    loadEntry();
+    $('saveStatus').textContent='이 날짜의 기록을 삭제했습니다.';
+  }
+  renderHome();
+  if(!$('calendarBackdrop').classList.contains('hidden')){
+    if(selectedCalendarDate===dateStr) selectedCalendarDate=null;
+    renderCalendar();
+  }
+  return true;
+}
+function openCalendar(){
+  const today=new Date();
+  calendarMonth=new Date(today.getFullYear(),today.getMonth(),1);
+  selectedCalendarDate=null;
+  $('calendarBackdrop').classList.remove('hidden');
+  document.body.style.overflow='hidden';
+  renderCalendar();
+}
+function closeCalendar(){
+  $('calendarBackdrop').classList.add('hidden');
+  document.body.style.overflow='';
+}
+function renderCalendar(){
+  const entries=allSavedEntries();
+  const byDate=new Map(entries.map(x=>[x.date,x]));
+  const y=calendarMonth.getFullYear(), m=calendarMonth.getMonth();
+  $('calendarTitle').textContent=`${y}년 ${m+1}월`;
+  const monthEntries=entries.filter(x=>{const d=dateFromIso(x.date);return d.getFullYear()===y&&d.getMonth()===m;});
+  $('calendarCount').textContent=`이번 달 ${monthEntries.length}일 기록`;
+  const firstDay=new Date(y,m,1).getDay();
+  const lastDate=new Date(y,m+1,0).getDate();
+  const todayIso=isoDate(new Date());
+  const cells=[];
+  for(let i=0;i<firstDay;i++) cells.push('<div class="cal-day empty"></div>');
+  for(let day=1;day<=lastDate;day++){
+    const ds=isoDate(new Date(y,m,day));
+    const recorded=byDate.has(ds);
+    cells.push(`<button class="cal-day ${recorded?'recorded':''} ${ds===todayIso?'today':''} ${ds===selectedCalendarDate?'selected':''}" ${recorded?`data-cal-date="${ds}"`:''} aria-label="${m+1}월 ${day}일${recorded?', 기록 있음':''}"><span class="day-num">${day}</span></button>`);
+  }
+  $('calendarGrid').innerHTML=cells.join('');
+  renderCalendarDetail(byDate.get(selectedCalendarDate));
+}
+function renderCalendarDetail(entry){
+  if(!entry){
+    $('recordDetail').className='record-detail empty';
+    $('recordDetail').innerHTML='동그라미 표시된 날짜를 선택해보세요.';
+    return;
+  }
+  const d=dateFromIso(entry.date), pr=promptFor(d);
+  const q=(entry.data.question||pr.prompt||'').trim();
+  const snippet=(entry.data.answer||entry.data.discovery||entry.data.nextQuestion||'').trim() || '작성된 본문은 없지만 부가 기록이 있습니다.';
+  $('recordDetail').className='record-detail';
+  $('recordDetail').innerHTML=`
+    <div class="detail-top"><div><div class="detail-date">${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일</div><div class="detail-part">${escapeHTML(pr.part.name)} · ${Math.max(1,Math.round((Number(entry.data.seconds)||0)/60))}분</div></div></div>
+    <div class="detail-question">${escapeHTML(q)}</div>
+    <div class="detail-snippet">${escapeHTML(snippet)}</div>
+    <div class="detail-actions"><button data-calendar-edit="${entry.date}">수정하기</button><button class="danger-btn" data-calendar-delete="${entry.date}">삭제</button></div>`;
+}
+
+function renderHome(){
+  const today=new Date();
+  const t=promptFor(today);
+  $('homeTodayDate').textContent=today.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
+  $('homeTodayPart').textContent=`Part ${String(t.partIndex+1).padStart(2,'0')} · ${t.part.name}`;
+  $('homeTodayQuestion').textContent=t.prompt;
+
+  const entries=allSavedEntries();
+  const partStats=JOURNAL.map((p,i)=>{
+    const partEntries=entries.filter(x=>promptFor(dateFromIso(x.date)).partIndex===i);
+    const answeredEntries=partEntries.filter(x=>(x.data.answer||'').trim());
+    const answeredQuestions=new Set(answeredEntries.map(x=>(x.data.question||promptFor(dateFromIso(x.date)).prompt).trim()).filter(Boolean));
+    const answered=Math.min(answeredQuestions.size,p.prompts.length);
+    const total=p.prompts.length;
+    const rate=total?Math.round(answered/total*100):0;
+    return {records:partEntries.length,answered,total,rate};
+  });
+  $('homePartGrid').innerHTML=JOURNAL.map((p,i)=>{
+    const st=partStats[i];
+    return `<div class="part-card">
+      <div class="part-no">${String(i+1).padStart(2,'0')}</div>
+      <div class="part-name">${escapeHTML(p.name)}</div>
+      <div class="part-stats">
+        <div class="part-stat-row"><span>질문 답변</span><strong>${st.answered} / ${st.total}</strong></div>
+        <div class="part-stat-row"><span>총 기록</span><strong>${st.records}회</strong></div>
+        <div class="part-progress"><span style="width:${st.rate}%"></span></div>
+        <div class="part-rate">질문 진행률 ${st.rate}%</div>
+      </div>
+    </div>`;
+  }).join('');
+  $('statDays').textContent=entries.length;
+  $('statStreak').textContent=streakCount(entries);
+  const minutes=Math.round(entries.reduce((s,x)=>s+(Number(x.data.seconds)||0),0)/60);
+  $('statMinutes').textContent=minutes.toLocaleString('ko-KR');
+  const emotions={}; entries.forEach(x=>(Array.isArray(x.data.emotions)?x.data.emotions:[]).forEach(e=>emotions[e]=(emotions[e]||0)+1));
+  const common=Object.entries(emotions).sort((a,b)=>b[1]-a[1])[0]?.[0]||'—';
+  $('statEmotion').textContent=common;
+
+  const latest=entries[0];
+  if(latest){
+    const d=dateFromIso(latest.date); const pr=promptFor(d);
+    $('continueTitle').textContent=`${d.getMonth()+1}월 ${d.getDate()}일 · ${pr.part.name}`;
+    const copy=(latest.data.discovery||latest.data.answer||'').trim();
+    $('continueCopy').textContent=copy ? (copy.length>72?copy.slice(0,72)+'…':copy) : '이 날의 기록을 다시 열어볼 수 있습니다.';
+    $('continueBtn').disabled=false; $('continueBtn').dataset.date=latest.date;
+  }else{
+    $('continueTitle').textContent='첫 기록을 시작해보세요';
+    $('continueCopy').textContent='오늘 한 문장만 적어도 첫 기록이 됩니다.';
+    $('continueBtn').disabled=true; delete $('continueBtn').dataset.date;
+  }
+
+  if(entries.length){
+    $('recentList').innerHTML=entries.slice(0,6).map(x=>{
+      const d=dateFromIso(x.date); const pr=promptFor(d);
+      const snippet=(x.data.discovery||x.data.answer||x.data.nextQuestion||'기록 있음').replace(/\s+/g,' ').trim();
+      return `<div class="recent-item"><span class="recent-date">${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}</span><span class="recent-part">${escapeHTML(pr.part.name)}</span><span class="recent-snippet">${escapeHTML(snippet||'기록 있음')}</span><span class="recent-actions"><button class="mini-btn" data-edit-date="${x.date}">수정</button><button class="mini-btn danger" data-delete-date="${x.date}">삭제</button></span></div>`
+    }).join('');
+  }else{
+    $('recentList').innerHTML='<div class="empty-state">아직 기록이 없습니다. 오늘의 질문으로 첫 페이지를 만들어보세요.</div>';
+  }
+}
+
+$('emotions').innerHTML=EMOTIONS.map(e=>`<span class="chip" data-value="${e}">${e}</span>`).join('');
+$('emotions').addEventListener('click',e=>{if(e.target.classList.contains('chip')){e.target.classList.toggle('active');saveEntry(false);}});
+
+$('authForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(SUPABASE_ANON_KEY==='__SUPABASE_ANON_KEY__') return;
+  const email=$('authEmail').value.trim();
+  if(!email) return;
+  $('authSubmit').disabled=true;
+  $('authStatus').textContent='로그인 링크를 보내는 중…';
+  const redirectTo=location.origin+location.pathname;
+  const {error}=await supabaseClient.auth.signInWithOtp({email,options:{emailRedirectTo:redirectTo,shouldCreateUser:true}});
+  if(error){
+    console.error(error);
+    $('authStatus').textContent='로그인 링크를 보내지 못했습니다. 이메일 주소를 확인한 뒤 다시 시도해주세요.';
+    $('authSubmit').disabled=false;
+    return;
+  }
+  $('authStatus').textContent='이메일을 보냈습니다. 받은 편지함에서 로그인 링크를 눌러주세요.';
+  $('authSubmit').textContent='링크 다시 받기';
+  $('authSubmit').disabled=false;
+});
+$('logoutBtn').onclick=async()=>{
+  $('logoutBtn').disabled=true;
+  await saveChain.catch(()=>{});
+  const {error}=await supabaseClient.auth.signOut();
+  $('logoutBtn').disabled=false;
+  if(error){console.error(error);setSyncStatus('로그아웃하지 못했습니다.',true);}
+};
+$('migrateBtn').onclick=migrateLocalEntries;
+
+$('homeBtn').onclick=()=>{saveEntry(false);showHome();};
+$('startToday').onclick=()=>showJournal(new Date());
+$('homeExportJson').onclick=exportJson;
+$('continueBtn').onclick=()=>{const d=$('continueBtn').dataset.date;if(d)showJournal(dateFromIso(d));};
+$('recentList').addEventListener('click',e=>{
+  const edit=e.target.closest('[data-edit-date]'); if(edit){showJournal(dateFromIso(edit.dataset.editDate));return;}
+  const del=e.target.closest('[data-delete-date]'); if(del){removeEntry(del.dataset.deleteDate);return;}
+});
+
+$('recordedDaysStat').onclick=openCalendar;
+$('recordedDaysStat').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openCalendar();}};
+$('calClose').onclick=closeCalendar;
+$('calPrev').onclick=()=>{calendarMonth=new Date(calendarMonth.getFullYear(),calendarMonth.getMonth()-1,1);selectedCalendarDate=null;renderCalendar();};
+$('calNext').onclick=()=>{calendarMonth=new Date(calendarMonth.getFullYear(),calendarMonth.getMonth()+1,1);selectedCalendarDate=null;renderCalendar();};
+$('calToday').onclick=()=>{const t=new Date();calendarMonth=new Date(t.getFullYear(),t.getMonth(),1);selectedCalendarDate=null;renderCalendar();};
+$('calendarBackdrop').addEventListener('click',e=>{if(e.target===$('calendarBackdrop'))closeCalendar();});
+$('calendarGrid').addEventListener('click',e=>{const b=e.target.closest('[data-cal-date]');if(!b)return;selectedCalendarDate=b.dataset.calDate;renderCalendar();});
+$('recordDetail').addEventListener('click',e=>{
+  const edit=e.target.closest('[data-calendar-edit]'); if(edit){const d=edit.dataset.calendarEdit;closeCalendar();showJournal(dateFromIso(d));return;}
+  const del=e.target.closest('[data-calendar-delete]'); if(del){removeEntry(del.dataset.calendarDelete);return;}
+});
+$('deleteCurrent').onclick=()=>removeEntry(isoDate(currentDate));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('calendarBackdrop').classList.contains('hidden'))closeCalendar();});
+
+$('prevDay').onclick=()=>changeDay(-1); $('nextDay').onclick=()=>changeDay(1);
+$('todayBtn').onclick=()=>{saveEntry(false);currentDate=new Date();updatePage();};
+$('datePicker').onchange=e=>{saveEntry(false);currentDate=dateFromIso(e.target.value);updatePage();};
+$('saveBtn').onclick=()=>saveEntry(true);
+$('timerToggle').onclick=()=>timerId?stopTimer():startTimer(); $('timerReset').onclick=resetTimer;
+$('exportMd').onclick=exportMarkdown; $('exportJson').onclick=exportJson;
+['answer','word1','word2','word3','emotionBody','emotionSituation','emotionThought','emotionAccept','emotionNeed','discovery','nextQuestion'].forEach(id=>$(id).addEventListener('input',()=>{ $('saveStatus').textContent='입력 중… 자동저장됩니다.'; clearTimeout(window.__autosave); window.__autosave=setTimeout(()=>saveEntry(false),500); }));
+$('emotionIntensity').addEventListener('input',e=>{ $('emotionIntensityValue').textContent=`${e.target.value} / 10`; $('saveStatus').textContent='입력 중… 자동저장됩니다.'; clearTimeout(window.__autosave); window.__autosave=setTimeout(()=>saveEntry(false),250); });
+window.addEventListener('beforeunload',()=>{if(!$('journalView').classList.contains('hidden'))saveEntry(false);});
+initAuth();
+</script>
+</body>
+</html>
